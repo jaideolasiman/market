@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Web Page </title>
+    <link rel="stylesheet" href="/public/css/style.css">
+    <!-- Custom fonts for this template-->
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Satisfy&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
+    
+
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">PAO Market
+                <button class="profile-btn" onclick="toggleProfileDropdown()"> 
+                    <img 
+                        src="<%= userLogin.profilePicture ? userLogin.profilePicture : '/public/img/default-profile.png' %>" 
+                        alt="Profile Icon" 
+                        class="profile-icon">
+                </button>
+            </div>
+           
+            <ul class="nav-links">
+                <!-- Edit Information Icon -->
+                <li><button class="edit-info-btn" onclick="editInformation()">
+                    <img src="/public/img/edit-user.png" alt="Edit Icon" class="edit-icon">
+                    <span class="icon-label">Edit Information</span> <!-- Label for Edit Icon -->
+                </button></li>
+    
+                <!-- Submitted Items Icon-->
+                <li><button class="fullscreen-btn" onclick="toggleFullscreen()">
+                    <img src="/public/img/cart.png" alt="Full Screen Icon" class="cart-icon">
+                    <span class="icon-label"> Submitted Items</span> 
+                </button></li>
+    
+                <!-- Currently Bids Icon
+                <li><button class="bids-btn" onclick="viewCurrentBids()">
+                    <img src="/public/img/clock_user.png" alt="Currently Bids Icon" class="bids-icon">
+                    <span class="icon-label">Currently in Bid</span> 
+                </button></li>-->
+            </ul>
+            <!-- Dropdown Profile Container -->
+            <div id="profileDropdown" class="profile-dropdown" style="display: none;">
+                <div class="profile-info">
+                    <!-- Display Profile Picture -->
+                    <img 
+                        src="<%= userLogin.profilePicture ? userLogin.profilePicture : '/public/img/default-profile.png' %>" 
+                        alt="Profile Picture" 
+                        class="profile-picture">
+                    
+                    <!-- User Information -->
+                    <p><strong>Name:</strong> <%= userLogin.firstName %> <%= userLogin.lastName %></p>
+                    <p><strong>Email:</strong> <%= userLogin.email %></p>
+                    <p><strong>Phone Number:</strong> <%= userLogin.phoneNumber %></p>
+                    <p><strong>Role:</strong> <%= userLogin.role %></p>
+                    <p><strong>Gender:</strong> <%= userLogin.gender %></p>
+                    <button onclick="toggleProfileDropdown()">Close</button>
+                </div>
+            </div>
+            
+            </div>
+            <div class="search-container">
+                <input type="text" placeholder="Search for products...">
+                <button>Search</button>
+                
+                <div class="settings-container">
+                    <button class="settings-button" onclick="toggleSettingsDropdown()">
+                        <img src="/public/img/settings.png" alt="Settings Icon" class="settings-icon">
+                    </button>
+                    <div class="settings-dropdown" id="settingsDropdown">
+                        <ul>
+                            <form action="/logout" method="post">
+                                <li class="dropdown-item">
+                                <button type="submit" class="btn btn-link nav-link w-100 text-left" >sign out</button>
+                              </li>
+                            </form>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        
+
+        <section class="banner">
+            <h1>Feed your family the best</h1>
+            <p>Exclusive Offer - 30% Off</p>
+            <span>From ₱50.99</span>
+        </section>
+        <div class="category-bar">
+            <!-- Label Text for Your Products -->
+            <label for="your-products" class="products-label">Your Products</label>
+        
+            <!-- Display Categories -->
+            <div class="categories-list">
+                <span class="category-item all-products" onclick="showAllProducts()">All Products</span>
+                <% if (categories && categories.length > 0) { %>
+                    <% categories.forEach(category => { %>
+                        <span class="category-item" onclick="filterProducts('<%= category._id %>')">
+                            <%= category.name %>
+                        </span>
+                    <% }) %>
+                <% } else { %>
+                    <span>No categories available</span>
+                <% } %>
+            </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search for a product..." onkeyup="searchProducts()">
+                    <button>Search</button>
+                </div>
+                <button class="add-product-button" onclick="openModal()">Add Product</button>
+        </div>       
+          
+        
+            <!-- Modal for Add Product -->
+        <div id="productModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <center><h3>Submit New Product</h3></center>
+
+                <form id="productFormSubmit" action="/farmer/addProduct" method="POST" enctype="multipart/form-data">
+                    <!-- Category Selection -->
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Select Category</option>
+                        <% categories.forEach(category => { %>
+                            <option value="<%= category._id %>"><%= category.name %></option>
+                        <% }) %>
+                    </select><br><br>
+                
+                    <!-- Product Type Selection: Wholesale or Retail -->
+                    <label for="productType">Product Type</label><br>
+                    <input type="radio" id="wholesaleProduct" name="productType" value="wholesale" onclick="toggleAuctionFields(true)" required>
+                    <label for="wholesaleProduct">Wholesale Product</label>
+                    <input type="radio" id="retailProduct" name="productType" value="retail" onclick="toggleAuctionFields(false)">
+                    <label for="retailProduct">Retail Product</label><br><br>
+                
+                    <!-- Name of Product -->
+                    <label for="name">Name of Product</label>
+                    <input type="text" id="name" name="name" required><br><br>
+                
+                    <!-- Minimum Price -->
+                    <label for="minPrice">Minimum Price</label>
+                    <input type="number" id="minPrice" name="minPrice" required><br><br>
+                
+                    <!-- Product Information -->
+                    <label for="productInfo">Product Information</label>
+                    <textarea id="productInfo" name="productInfo" rows="4" required></textarea><br><br>
+                
+                     <!-- Auction Date and Time (Initially hidden) -->
+                    <div id="auctionFields" style="display: none;">
+                        <label for="auctionStart">Auction Start</label>
+                        <input type="datetime-local" id="auctionStart" name="auctionStart"><br><br>
+
+                        <label for="auctionEnd">Auction End</label>
+                        <input type="datetime-local" id="auctionEnd" name="auctionEnd"><br><br>
+                    </div>
+                
+                    <!-- Product Image -->
+                    <label for="image">Product Image</label>
+                    <input type="file" id="image" name="image" accept="image/*" required>
+                
+                    <!-- Submit Button -->
+                    <center><button type="submit">Submit Product</button></center>
+                </form>
+                <% if (messages.success) { %>
+                    <script>
+                        alert("<%= messages.success %>");
+                    </script>
+                <% } %>               
+            </div>
+        </div>
+
+
+        <section class="product-list">
+            <!-- All Products Section -->
+            <div id="all-products-section">
+                <h3>All Products</h3>
+        
+                <!-- Retail Products -->
+                <% if (retailProducts.length > 0) { %>
+                    <h4>Retail Products</h4>
+                    <div class="product-container">
+                        <% retailProducts.forEach(product => { %>
+                            <div class="product">
+                                <div class="product-image-container">
+                                    <img src="<%= product.image ? '/public/img/product/' + (product.image.split('/').pop() || '') : '/public/img/default.png' %>" 
+                                         alt="<%= product.name %>" class="product-image">
+                                </div>
+                                <h4><%= product.name %></h4>
+                                <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                <button class="showbuyer" onclick="showbuyer()">Show Buyers</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+        
+                <!-- Wholesale Products -->
+                <% if (wholesaleProducts.length > 0) { %>
+                    <h4>Wholesale Products</h4>
+                    <div class="product-container">
+                        <% wholesaleProducts.forEach(product => { %>
+                            <div class="product">
+                                <div class="product-image-container">
+                                    <img src="<%= product.image ? '/public/img/product/' + (product.image.split('/').pop() || '') : '/public/img/default.png' %>" 
+                                         alt="<%= product.name %>" class="product-image">
+                                </div>
+                                <h4><%= product.name %></h4>
+                                <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                <button class="participated" onclick="participateAuction('<%= product._id %>')">Show Participated</button>
+                            </div>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+        
+            <!-- Category-Based Products Section -->
+            <div id="category-products-section" style="display: none;">
+                <% groupedProducts.forEach(group => { %>
+                    <div class="category-section" data-category-id="<%= group.category._id %>">
+                        <h3><%= group.category.name %></h3>
+        
+                        <!-- Retail Products -->
+                        <% if (group.retailProducts.length > 0) { %>
+                            <h4>Retail Products</h4>
+                            <div class="product-container">
+                                <% group.retailProducts.forEach(product => { %>
+                                    <div class="product">
+                                        <div class="product-image-container">
+                                            <img src="<%= product.image ? '/public/img/product/' + (product.image.split('/').pop() || '') : '/public/img/default.png' %>" 
+                                                 alt="<%= product.name %>" class="product-image">
+                                        </div>
+                                        <h4><%= product.name %></h4>
+                                        <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                        <button class="showbuyer" onclick="showbuyer()">Show Buyers</button>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+        
+                        <!-- Wholesale Products -->
+                        <% if (group.wholesaleProducts.length > 0) { %>
+                            <h4>Wholesale Products</h4>
+                            <div class="product-container">
+                                <% group.wholesaleProducts.forEach(product => { %>
+                                    <div class="product">
+                                        <div class="product-image-container">
+                                            <img src="<%= product.image ? '/public/img/product/' + (product.image.split('/').pop() || '') : '/public/img/default.png' %>" 
+                                                 alt="<%= product.name %>" class="product-image">
+                                        </div>
+                                        <h4><%= product.name %></h4>
+                                        <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                        <button class="participated" onclick="participateAuction('<%= product._id %>')">Show Participated</button>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }) %>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer>
+        <div class="footer-left">
+            <button id="notificationButton" class="notification-button">
+                <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
+                <span class="notification-count" id="notificationCount">
+                    <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
+                </span>
+            </button>
+        </div>
+        
+        <!-- Modal for notifications -->
+        <div id="notificationModal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModalButton">&times;</span>
+                <center><h3>Notifications</h3></center>
+                <ul id="notificationList">
+                    <% notifications.forEach(notification => { %>
+                        <li id="notification-<%= notification._id %>" class="notification <%= notification.status === 'unread' ? 'unread' : 'read' %>">
+                            <p><%= notification.message %></p>
+                            <% if (notification.status === 'unread') { %>
+                                <a href="/farmer/notification?notification_id=<%= notification._id %>" class="btn btn-primary mark-as-read">
+                                    Seen
+                                </a>
+                            <% } %>
+                            <span class="close-notification" onclick="closeNotification('<%= notification._id %>')">&times;</span>
+                        </li>
+                    <% }); %>
+                </ul>
+                
+                
+            </div>
+        </div>
+        
+    
+        <div class="footer-right">
+            <img src="/public/img/clock.png" alt="Clock Icon" class="clock-icon">
+            <span id="currentTime" class="current-time"></span>
+        </div>
+        
+        <p>&copy; 2024 PAO Market. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Ensure the DOM is fully loaded before running scripts
+        document.addEventListener('DOMContentLoaded', function() {
+               // Get the modal and notification button
+               const modal = document.getElementById("notificationModal");
+               const notificationButton = document.getElementById("notificationButton");
+               const closeModalButton = document.getElementById("closeModalButton");
+       
+               // Open the modal when the notification button is clicked
+               notificationButton.onclick = function() {
+                   modal.style.display = "block";
+               }
+       
+               // Close the modal when the close button is clicked
+               closeModalButton.onclick = function() {
+                   modal.style.display = "none";
+               }
+       
+               // Close the modal if the user clicks outside of the modal
+               window.onclick = function(event) {
+                   if (event.target == modal) {
+                       modal.style.display = "none";
+                   }
+               }
+       
+               // Attach event listeners for each "close" button in the notification list
+               const closeButtons = document.querySelectorAll('.close-notification');
+               closeButtons.forEach(button => {
+                   button.addEventListener('click', function(event) {
+                       const notificationId = event.target.getAttribute('data-notification-id');
+                       closeNotification(notificationId);
+                   });
+               });
+           });
+       
+           // Function to close individual notification
+           // Close notification and hide it temporarily using localStorage
+       function closeNotification(notificationId) {
+           // Save the closed notification ID to localStorage
+           let closedNotifications = JSON.parse(localStorage.getItem('closedNotifications')) || [];
+           closedNotifications.push(notificationId);
+           localStorage.setItem('closedNotifications', JSON.stringify(closedNotifications));
+       
+           // Hide the notification element on the page
+           const notificationElement = document.getElementById(`notification-${notificationId}`);
+           notificationElement.style.display = 'none';
+       }
+       // Check localStorage for closed notifications and hide them on page load
+       window.onload = function() {
+           const closedNotifications = JSON.parse(localStorage.getItem('closedNotifications')) || [];
+       
+           // Hide all closed notifications
+           closedNotifications.forEach(notificationId => {
+               const notificationElement = document.getElementById(`notification-${notificationId}`);
+               if (notificationElement) {
+                   notificationElement.style.display = 'none';
+               }
+           });
+       };
+       
+       function showBuyers(productId, productName) {
+           document.getElementById("productTitle").innerText = productName;
+       
+           fetch(`/farmer/getBuyers?productId=${productId}`)
+               .then(response => response.json())
+               .then(data => {
+                   if (data.length === 0) {
+                       document.getElementById("buyersList").innerHTML = "<tr><td colspan='4'>No buyers found.</td></tr>";
+                   } else {
+                       const buyersList = data.map(buyer => {
+                           return `
+                               <tr>
+                                   <td>${buyer.buyerName}</td>
+                                   <td>${buyer.quantity}</td>
+                                   <td>${buyer.status}</td>
+                                   <td>
+                                       <button onclick="processOrder('${buyer._id}', 'approve')">Approve</button>
+                                       <button onclick="processOrder('${buyer._id}', 'reject')">Reject</button>
+                                   </td>
+                               </tr>
+                           `;
+                       }).join('');
+                       
+                       document.getElementById("buyersList").innerHTML = buyersList;
+                   }
+       
+                   const modal = document.getElementById('buyersModal');
+                   modal.style.display = 'block';
+               })
+               .catch(error => {
+                   console.error('Error fetching buyers:', error);
+                   alert('Error fetching buyers');
+               });
+       }
+    </script>
+
+    <script src="/public/js/scriptss.js"></script>
+     <script src="/public/js/scripts.js"></script>
