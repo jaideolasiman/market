@@ -92,6 +92,12 @@ module.exports.confirmPurchase = async (req, res) => {
             return res.status(404).json({ success: false, message: "Product not found." });
         }
 
+        // Get buyer details from session (assuming req.session.login contains user ID)
+        const buyer = await User.findById(req.session.login);
+        if (!buyer) {
+            return res.status(404).json({ success: false, message: "Buyer not found." });
+        }
+
         // Save order with seller information
         const order = new Order({
             product: productId,
@@ -102,6 +108,15 @@ module.exports.confirmPurchase = async (req, res) => {
         });
 
         await order.save();
+
+        // Create a notification for the seller with buyer's first name and last name
+        const notification = new Notification({
+            user: product.seller, // Seller ID (Farmer)
+            message: `${buyer.firstName} ${buyer.lastName} confirmed a purchase of ${quantity} ${product.name} for ₱${totalPrice}.`,
+            status: 'unread'
+        });
+
+        await notification.save();
 
         res.status(200).json({ success: true, message: "Order placed successfully!" });
     } catch (error) {
