@@ -5,6 +5,7 @@ const authVerifyEdiController = require('../controllers/auth/verifyEditControlle
 const authLogoutController = require('../controllers/auth/logoutController');
 const authTermsController = require('../controllers/auth/termsController');
 const profileController = require('../controllers/auth/profileController');
+const editController = require('../controllers/auth/editController');
 
 const adminIndexController = require('../controllers/admin/indexController');
 const adminManageCategoryController = require('../controllers/admin/manageCategoryController');
@@ -36,6 +37,8 @@ module.exports = function (app) {
   app.get('/terms', authTermsController.index);
   app.post('/upload-profile', profileController.uploadProfilePicture);
   app.get('/profile', profileController.getProfile);
+  app.get('/getUserInfo', editController.getUserInfo);
+  app.post('/updateUserInfo', editController.updateUserInfo);
 
   app.get('/admin/index', adminIndexController.index);
   app.get('/admin/manageCategory', adminManageCategoryController.index);
