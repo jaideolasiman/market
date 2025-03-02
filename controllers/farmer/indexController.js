@@ -10,6 +10,7 @@ const Notification = require("../../models/notification");
 const Order = require("../../models/order");
 const AuctionSession = require("../../models/auctionSession");
 const auctionResult = require("../../models/auctionResult");
+const AuctionParticipation = require("../../models/participateAuction");
 const SITE_TITLE = "PAO";
 
 module.exports.index = async (req, res) => {
@@ -353,18 +354,26 @@ module.exports.showBuyers = async (req, res) => {
 };
 module.exports.showParticipated = async (req, res) => {
   try {
-    const orders = await Order.find({ buyer: req.session.login })
-      .populate("product", "name seller")
-      .populate("seller", "name email");
+    const orders = await AuctionParticipation.find({ product: req.query.productId })
+    // "buyer",
+    // "firstName lastName"
+
+    console.log('asd', orders.length)
+    console.log('asd', orders)
+
+    const participated = orders.map((order) => ({
+      firstName: order.buyer ? order.buyer.firstName : "Unknown",
+      lastName: order.buyer ? order.buyer.lastName : "Buyer",
+    }));
 
     if (!orders.length) {
       return res.status(404).json({ message: "No participated orders found." });
     }
 
-    res.json(orders);
+    return res.json(participated);
   } catch (error) {
-    console.error("Error fetching participated orders:", error);
-    res.status(500).json({ error: "Server error" });
+    console.error("Error fetching buyers:", error);
+    return res.status(500).json({ error: "Server error" });
   }
 };
 

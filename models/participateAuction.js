@@ -5,7 +5,7 @@ const AuctionParticipationSchema = new mongoose.Schema({
     buyer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     seller: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     // add approved default false
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now }    
 });
 
 module.exports = mongoose.model("AuctionParticipation", AuctionParticipationSchema);

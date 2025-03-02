@@ -204,9 +204,12 @@
             
             </div>
             <div class="search-container">
-                <!--<input type="text" placeholder="Search for products..."
-                <button>Search</button>-->
-                
+                <button id="notificationButton" class="notification-button" style="color: navy;">
+                    <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
+                    <span class="notification-count" id="notificationCount">
+                        <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
+                    </span>
+                </button>
                 <div class="settings-container">
                     <button class="settings-button" onclick="toggleSettingsDropdown()">
                         <img src="/public/img/settings.png" alt="Settings Icon" class="settings-icon">
@@ -447,46 +450,27 @@
     </main>
 
     <!-- Show Buyers Modal -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeShowBuyersModal()" style="display: none;"></div>
+    <div class="modal-content" onclick="closeShowBuyersModal()" style="display: none;"></div>
         <div id="showBuyersModal" class="modal">        
             <span class="close" onclick="closeShowBuyersModal()">&times;</span>
             <h2>Buyers for this Product</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Quantity</th>
-                        <th>Total Price</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="buyersList"></tbody>
-            </table>
+                <ul id="showbuyersList"></ul>
         </div>
     </div>
     
 <!-- Show Participated Modal -->
-<div id="showParticipantsModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeShowParticipantsModal()">&times;</span>
-        <h2>Participants List</h2>
-        <ul id="participantsList"></ul>
+    <div class="modal-content" onclick="closeShowParticipantsModal()" style="display: none;"></div>
+        <div id="showParticipantsModal" class="modal">
+            <span class="close" onclick="closeShowParticipantsModal()">&times;</span>
+            <h2>Participants List</h2>
+            <ul id="participantsList"></ul>
+        </div>
     </div>
-</div>
 
     <footer>
         <div class="footer-left">
-            <button id="notificationButton" class="notification-button">
-                <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
-                <span class="notification-count" id="notificationCount">
-                    <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
-                </span>
-            </button>
+
         </div>
-        
         <!-- Modal for notifications -->
         <div id="notificationModal" class="modal">
             <div class="modal-content">
@@ -964,7 +948,7 @@ async function showBuyers(productId) {
             return;
         }
 
-        const buyersList = document.getElementById("buyersList");
+        const buyersList = document.getElementById("showbuyersList");
         buyersList.innerHTML = ""; // Clear previous list
 
         if (data.buyers && data.buyers.length > 0) {
@@ -987,7 +971,7 @@ async function showBuyers(productId) {
 }
 
 // Function to close the modal
-function closeModal() {
+function closeShowBuyersModal() {
     document.getElementById("showBuyersModal").style.display = "none";
 }
 
@@ -1003,12 +987,13 @@ window.onclick = function(event) {
 
 // Function to fetch and display participants in modal
 function participateAuction(productId) {
-    fetch(`/api/get-participants/${productId}`)
-        .then(response => response.json())
+    fetch(`/farmer/showParticipated?productId=${productId}`)
+        // .then(response => response.json())
         .then(data => {
+            console.log('data',data)
             const participantsList = document.getElementById('participantsList');
             participantsList.innerHTML = ''; // Clear previous data
-            data.participants.forEach(participant => {
+            data.orders.forEach(participant => {
                 let listItem = document.createElement('li');
                 listItem.textContent = `${participant.firstName} ${participant.lastName}`;
                 participantsList.appendChild(listItem);

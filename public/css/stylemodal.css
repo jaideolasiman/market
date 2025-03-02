@@ -21,13 +21,30 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgb(179, 177, 177);
-    padding: 25px;
+    padding: 35px;
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     max-width: 90%;
-    width: 700px;
+    width: 500px;
     max-height: 90vh; /* Prevents overflow */
     overflow-y: auto; /* Enables vertical scrolling */
+    font-size: x-large;
+}
+
+#showParticipatedModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgb(179, 177, 177);
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 90%;
+    width: 500px;
+    max-height: 90vh; /* Prevents overflow */
+    overflow-y: auto; /* Enables vertical scrolling */
+    font-size: x-large;
 }
 
 #auctionResultsModal {

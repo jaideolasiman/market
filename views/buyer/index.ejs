@@ -97,7 +97,12 @@
                 </div>
             </div>
             <div class="search-container">
-                
+                <button id="notificationButton" class="notification-button">
+                    <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
+                    <span class="notification-count" id="notificationCount">
+                        <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
+                    </span>
+                </button>
                 
      
                 <div class="settings-container">
@@ -152,7 +157,7 @@
                 
                 <!-- Retail Products -->
                 <% if (retailProducts && retailProducts.length > 0) { %>
-                    <h4>Retail Products</h4>
+                    <h2>Retail Products</h2>
                     <div class="product-container">
                         <% retailProducts.forEach(product => { %>
                             <% if (product.status === 'approved') { %> <!-- Only show approved products -->
@@ -184,7 +189,7 @@
         
                 <!-- Wholesale Products -->
                 <% if (wholesaleProducts && wholesaleProducts.length > 0) { %>
-                    <h4>Wholesale Products</h4>
+                    <h2>Wholesale Products</h2>
                     <div class="product-container">
                         <% wholesaleProducts.forEach(product => { %>
                             <% if (product.status === 'approved') { %> <!-- Only show approved products -->
@@ -264,7 +269,7 @@
                         <% } %>
         
                         <% if (group.wholesaleProducts && group.wholesaleProducts.length > 0) { %>
-                            <h4>Wholesale Products</h4>
+                            <h2>Wholesale Products</h2>
                             <div class="product-container">
                                 <% group.wholesaleProducts.forEach(product => { %>
                                     <% if (product.status === 'approved') { %> <!-- Only show approved products -->
@@ -362,12 +367,7 @@
     </main>
     <footer>
         <div class="footer-left">
-            <button id="notificationButton" class="notification-button">
-                <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
-                <span class="notification-count" id="notificationCount">
-                    <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
-                </span>
-            </button>
+            
         </div>
         
         <!-- Modal for notifications -->

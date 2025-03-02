@@ -113,7 +113,7 @@
         <div class="content">
             <div class="product-info">
                 <h2>Product Information</h2>
-                <% if (auctionSession) { %>
+                <% if (auctionSession && auctionSession.length > 0) { %>
                     <img src="/public/<%= auctionSession[0].product.image || '/default.jpg' %>" alt="<%= auctionSession[0].product.name %>">
                     <p><strong>Name:</strong> <%= auctionSession[0].product.name %></p>
                     <p><strong>Description:</strong> <%= auctionSession[0].product.productInfo || 'N/A' %></p>
