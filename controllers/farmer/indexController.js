@@ -9,7 +9,7 @@ const upload = require("../../middlewares/uploads");
 const Notification = require("../../models/notification");
 const Order = require("../../models/order");
 const AuctionSession = require("../../models/auctionSession");
-const auctionResult = require("../../models/auctionResult");
+const AuctionResult = require("../../models/auctionResult");
 const AuctionParticipation = require("../../models/participateAuction");
 const SITE_TITLE = "PAO";
 
@@ -379,28 +379,42 @@ module.exports.showParticipated = async (req, res) => {
 
 module.exports.getAuctionResults = async (req, res) => {
   try {
-      const auctionResults = await AuctionSession.find({ "highestBid.bidder": { $ne: null } }) // Fetch only auctions with a winner
-          .populate('highestBid.bidder', 'firstName lastName profilePicture') // Populate bidder details
-          .populate('product', 'name') // Populate product details
-          .lean();
+    const auctionResults = await AuctionSession.find({ "highestBid.bidder": { $ne: null } }) // Fetch only auctions with a winner
+      .populate("highestBid.bidder", "firstName lastName profilePicture") // Populate winner details
+      .populate("product", "name") // Populate product details
+      .lean();
 
-      const formattedResults = auctionResults.map(auction => ({
-          _id: auction._id,
-          winnerName: auction.highestBid.bidder 
-              ? `${auction.highestBid.bidder.firstName} ${auction.highestBid.bidder.lastName}` 
-              : 'Unknown',
-          profilePicture: auction.highestBid.bidder?.profilePicture || '/public/img/default-avatar.png',
-          productName: auction.product?.name || 'Unknown Product',
-          winningBid: auction.highestBid.amount,
-          status: auction.status || 'Pending'
-      }));
+    const formattedResults = auctionResults.map(auction => {
+      // Extract winner (Rank #1)
+      const bidRanking = auction.bids
+        ?.sort((a, b) => b.amount - a.amount) // Sort bids from highest to lowest
+        .map((bid, index, arr) => ({
+          rank: index > 0 && bid.amount === arr[index - 1].amount ? arr[index - 1].rank : index + 1, // Assign rank
+          bidder: bid.bidder ? `${bid.bidder.firstName} ${bid.bidder.lastName}` : "Unknown",
+          profilePicture: bid.bidder?.profilePicture || "/public/img/default-avatar.png",
+          bidAmount: bid.amount,
+        }));
 
-      res.json(formattedResults); // Send as JSON for frontend to display
+      const winner = bidRanking?.[0] || null; // Get Rank #1
+
+      return {
+        _id: auction._id,
+        winnerName: winner?.bidder || "Unknown",
+        profilePicture: winner?.profilePicture || "/public/img/default-avatar.png",
+        productName: auction.product?.name || "Unknown Product",
+        winningBid: winner?.bidAmount || 0,
+        status: auction.status || "Pending",
+        rank: winner?.rank || 1, // Explicitly state Rank #1
+      };
+    });
+
+    res.json(formattedResults); // Send JSON response
   } catch (error) {
-      console.error("Error fetching auction results:", error);
-      res.status(500).json({ error: "Server error fetching auction results" });
+    console.error("Error fetching auction results:", error);
+    res.status(500).json({ error: "Server error fetching auction results" });
   }
 };
+
 
 module.exports.approveAuctionResult = async (req, res) => {
   const { resultId } = req.body;

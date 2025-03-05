@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const auctionResultSchema = new mongoose.Schema({
+    auctionSession: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'AuctionSession', // Links to the auction session
+        required: true
+    },
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product', // Links to the auctioned product
@@ -17,6 +22,14 @@ const auctionResultSchema = new mongoose.Schema({
             required: true
         }
     },
+    auctionStartTime: {
+        type: Date,
+        required: true
+    },
+    auctionEndTime: {
+        type: Date,
+        required: true
+    },
     auctionEnded: {
         type: Boolean,
         default: false
@@ -30,6 +43,6 @@ const auctionResultSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-});
+}, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
 
-module.exports = mongoose.model('auctionResult', auctionResultSchema);
+module.exports = mongoose.model('AuctionResult', auctionResultSchema);

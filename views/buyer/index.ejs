@@ -223,7 +223,7 @@
                                         </button>
                                     <% } else { %>
                                         <button class="ended" disabled>Ended</button>
-                                        <button class="show-winner" onclick="showWinner('<%= product._id %>')">Show Winner</button>
+                                        <button class="show-winner" onclick="window.location.href='/buyer/auction/<%= product._id %>/results'">Show Winner</button>
                                     <% } %>
                                 </div>
                             <% } %>
@@ -304,7 +304,7 @@
                                                 </button>
                                             <% } else { %>
                                                 <button class="ended" disabled>Ended</button>
-                                                <button class="show-winner" onclick="showWinner('<%= product._id %>')">Show Winner</button>
+                                                <button class="show-winner" onclick="window.location.href='/buyer/auction/<%= product._id %>/results'">Show Winner</button>
                                             <% } %>
                                         </div>
                                     <% } %>

@@ -67,6 +67,9 @@
             border-radius: 8px;
             padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            font-size: larger;
+            font-weight: bold;
         }
 
         .product-info img, .winner-info img {
@@ -99,7 +102,7 @@
         .footer {
             text-align: center;
             padding: 10px;
-            font-size: 14px;
+            font-size: x-large;
             background: #f5f5f5;
         }
     </style>
@@ -107,7 +110,7 @@
 <body>
     <div class="container">
         <div class="banner">
-            🏆 Auction Result 🏆
+            <h1>🏆 Auction Result 🏆</h1>
             <a href="javascript:history.back()">Back</a>
         </div>
         <div class="content">
@@ -124,7 +127,7 @@
             </div>
 
             <div class="winner-info">
-                <h2>Winner</h2>
+                <h1>🏆 Winner 🏆</h1>
                 <% if (winner) { %>
                     <img src="<%= winner.image || '/default.jpg' %>" alt="Winner Profile Picture">
                     <p><strong>Name:</strong> <%= winner.bidder %></p>
@@ -144,12 +147,13 @@
                         <th>Bid Price</th>
                     </tr>
                     <% highestBid.forEach((bid, index) => { %>
-                        <% if(index === 0) return %>
-                        <tr>
-                            <td><%= bid.rank %></td>
-                            <td><%= bid.bidder %></td> 
-                            <td>₱<%= bid.bidAmount %></td>
-                        </tr>
+                        <% if (index > 0) { %> <!-- Skip winner -->
+                            <tr>
+                                <td><%= bid.rank %></td>  <!-- Rank starts at 2 -->
+                                <td><%= bid.bidder %></td>
+                                <td>₱<%= bid.bidAmount %></td>
+                            </tr>
+                        <% } %>
                     <% }); %>
                 </table>
             </div>

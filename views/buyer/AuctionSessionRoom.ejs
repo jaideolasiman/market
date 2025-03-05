@@ -80,16 +80,17 @@
             display: flex;
             justify-content: space-between;
             margin: 10px 0;
+            font-size: 1.3rem;
         }
 
         .card {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: center;
-            flex: 1;
+            flex: 2;
             margin: 5px;
             border-radius: 5px;
-            box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
 
         .card.active {
@@ -104,10 +105,11 @@
         .btn {
             background-color: #4caf50;
             color: white;
-            padding: 10px 15px;
+            padding: 10px 10px;
             border: none;
             cursor: pointer;
             border-radius: 3px;
+            font-size: larger;
         }
 
         .btn:hover {
@@ -115,14 +117,14 @@
         }
 
         .product-image {
-          width: 30%; /* Reduced size of the image */
+          width: 35%; /* Reduced size of the image */
           height: auto;
           max-width: 40%;
           margin: 0 auto;
     }
 
         .product-details {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .product-details p {
@@ -140,23 +142,23 @@
 
         .other-bidders .bidder {
             margin-bottom: 10px;
-            font-size: 1rem;
+            font-size: 1.3rem;
         }
 
         .input-section input {
             padding: 10px;
-            font-size: 5rem;
+            font-size: 1.3rem;
             width: 100%;
             margin: 10px 0;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 2px solid #ddd;
         }
 
         .input-section button {
             width: 100%;
             padding: 10px;
-            font-size: 5rem;
-            border-radius: 5px;
+            font-size: 1.3rem;
+            border-radius: 10px;
             cursor: pointer;
             background-color: #4caf50;
             color: white;
@@ -229,6 +231,7 @@
               id="submitPrice"
               name="submitPrice"
               placeholder="Enter Your Price"
+              style="font-size: 1.2rem; padding: 8px; width: 100%; max-width: 200px;"
             />
             <button class="btn" onclick="submitPrice()">Submit</button>
           </form>
@@ -241,13 +244,13 @@
             <% topBids.forEach((bid, index) => { %>
                 <% if (index > 2) { %>
                     <div class="bidder">
+                        <p>Rank: <strong><%= index + 1 %></strong></p>
                         <p>Name: <strong><%= bid.buyer.firstName ?? '' %> <%= bid.buyer.lastName ?? '' %></strong></p>
-                        <p>Submitted Price: <strong> ₱<%= bid.bid %></strong></p>
+                        <p>Submitted Price: <strong>₱<%= bid.bid %></strong></p>
                     </div>
                 <% } %>
             <% }) %>
         </div>
-    </div>
 
     <!-- JavaScript -->
     <script>
