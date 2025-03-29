@@ -1,0 +1,2 @@
+public/img/profile/*.psd filter=lfs diff=lfs merge=lfs -text
+public/img/profile/yellow_trophy_cup_winner_success_champion_icon_sign_or_symbol_3d_illustration.psd filter=lfs diff=lfs merge=lfs -text
