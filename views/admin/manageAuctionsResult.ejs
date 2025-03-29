@@ -1,0 +1,124 @@
+<%- include('./partials/header.ejs'); %>
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <%- include('./partials/navbar.ejs'); %>
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <%- include('./partials/topbar.ejs'); %>
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <div class="card shadow mb-4">
+                        <!-- Card Header -->
+                        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                            <h4 class="m-0 font-weight-bold text-primary">Auction Winners</h4>
+                            <!-- Search Bar -->
+                            <div class="input-group w-50">
+                                <form action="/admin/manageAuctionResult" method="GET" class="d-flex w-100">
+                                    <input type="text" class="form-control" id="searchAuction" name="searchAuction" placeholder="Search Product..." value="<%= searchAuction || '' %>">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <!-- Table Container -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover" id="auctionWinnerTable" width="100%" cellspacing="0">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Product Image</th>
+                                            <th>Farmer (Seller)</th>
+                                            <th>Winner Buyer</th>
+                                            <th>Winning Bid</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (auctionResults.length > 0) { %>
+                                            <% auctionResults.forEach(result => { %>
+                                                <tr>
+                                                    <!-- ✅ Product Name -->
+                                                    <td><strong><%= result.product ? result.product.name : 'No Product' %></strong></td>
+                        
+                                                    <!-- ✅ Product Image -->
+                                                    <td class="text-center">
+                                                        <% if (result.product && result.product.image) { %>
+                                                            <img src="/public/img/product/<%= result.product.image.split('/').pop() %>" 
+                                                                 alt="<%= result.product.name %>" 
+                                                                 width="60" height="60" class="rounded img-thumbnail">
+                                                        <% } else { %>
+                                                            <img src="/public/img/default-product.jpg" 
+                                                                 alt="No Image" width="60" height="60" class="rounded img-thumbnail">
+                                                            <small class="text-muted">No Image</small>
+                                                        <% } %>
+                                                    </td>
+                        
+                                                    <!-- ✅ Farmer (Seller) Name -->
+                                                    <td>
+                                                        <% if (result.product && result.product.seller) { %>
+                                                            <%= result.product.seller.firstName + ' ' + result.product.seller.lastName %>
+                                                        <% } else { %>
+                                                            <span class="text-muted">No Seller</span>
+                                                        <% } %>
+                                                    </td>
+                        
+                                                    <!-- ✅ Winner Buyer -->
+                                                    <td>
+                                                        <% if (result.winnerName && result.winnerName !== 'No Winner') { %>
+                                                            <strong><%= result.winnerName %></strong> <br>
+                                                            <small class="text-muted"><%= result.winnerPhone || 'No Contact' %></small>
+                                                        <% } else { %>
+                                                            <span class="text-muted">No Winner</span>
+                                                        <% } %>
+                                                    </td>
+                                                    
+                                                    <!-- ✅ Winning Bid Ranking -->
+                                                    <td class="text-right">
+                                                        <% if (result.winningBid && result.winningBid !== 'No Bids') { %>
+                                                            <%= result.winningBid %>
+                                                        <% } else { %>
+                                                            <span class="text-muted">No Bids</span>
+                                                        <% } %>
+                                                    </td>
+
+                        
+                                                    <!-- ✅ Action Buttons -->
+                                                    <td class="text-center">
+                                                        <a href="/buyer/auction/<%= result.product ? result.product._id : '' %>/results" class="btn btn-info btn-sm">
+                                                            <i class="fas fa-eye"></i> View
+                                                        </a>
+                                                        <form action="/admin/manageAuctionResult/delete" method="POST" style="display:inline;" 
+                                                            onsubmit="return confirm('Are you sure you want to delete this auction result?');">
+                                                            <input type="hidden" name="auctionId" value="<%= result._id %>">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                                <i class="fas fa-trash-alt"></i> Delete
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted">No auction results found.</td>
+                                            </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <%- include('./partials/footer.ejs'); %>
+</body>

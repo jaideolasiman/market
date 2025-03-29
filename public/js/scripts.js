@@ -8,8 +8,23 @@ function closeModal() {
     document.getElementById("productModal").style.display = "none";
 }
 
+// Function to show/hide auction and wholesale fields based on product type selection
+function toggleProductFields(isWholesale) {
+    document.getElementById("auctionFields").style.display = isWholesale ? "block" : "none";
+    document.getElementById("wholesaleFields").style.display = isWholesale ? "block" : "none";
+}
 
-// Handle the form submission via AJAX
+// Ensure the function is called when the radio buttons are clicked
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("wholesaleProduct").addEventListener("click", function() {
+        toggleProductFields(true);
+    });
+
+    document.getElementById("retailProduct").addEventListener("click", function() {
+        toggleProductFields(false);
+    });
+});
+
 // Handle the form submission via AJAX
 $(document).ready(function () {
     $("#productFormSubmit").on("submit", function (e) {
@@ -47,11 +62,6 @@ $(document).ready(function () {
     });
 });
 
-
-// Function to show/hide auction fields based on product type selection
-function toggleAuctionFields(show) {
-    document.getElementById("auctionFields").style.display = show ? "block" : "none";
-}
 
 // Convert auction date and time to Philippine format (for displaying)
 document.addEventListener("DOMContentLoaded", function () {

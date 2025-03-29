@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Session Room</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Basic CSS -->
+    <style>
+         body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #afb2b4;
+            color: #333;
+        }
+
+        .session-container {
+            margin: 20px auto;
+            width: 90%;
+            background-color: #4bad63;
+            box-shadow: 0 4px 10px rgba(189, 161, 161, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .main-content {
+            flex: 2;
+            max-width: 70%;
+        }
+
+        .other-bidders {
+            flex: 1;
+            max-width: 28%;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #f1f1f1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f0f4f8;
+        }
+
+        .leave-button-header {
+            background-color: #025a09;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .leave-button-header:hover {
+            background-color: #a30505;
+        }
+
+        .timer {
+            text-align: center;
+            font-size: 1.5rem;
+            margin: 15px 0;
+            color: #faf3f3;
+        }
+
+        .leaderboard {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card {
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            background: #4bad63;
+            color: rgb(249, 249, 252);
+            font-weight: bold;
+        }
+
+        .card.active {
+            border: 3px solid #28a745;
+        }
+
+        .input-section {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
+            border-radius: 8px;
+        }
+
+        .product-details p {
+            font-size: 1.2rem;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+
+        .input-section input {
+            padding: 10px;
+            font-size: 1.2rem;
+            width: 100%;
+            max-width: 250px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+
+        .input-section button {
+            width: 100%;
+            max-width: 250px;
+            padding: 12px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+        }
+
+        .other-bidders h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #068847;
+            text-align: center;
+        }
+
+        .bidder p {
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 900px) {
+            .session-container {
+                flex-direction: column;
+            }
+            .main-content, .other-bidders {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="session-container">
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Auction Session Room</h2>
+                <!-- Leave Bid Button in Header -->
+                <button class="leave-button-header" onclick="leaveBid()">Leave Bid</button>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer">
+                <p>Auction Start: <strong><%= new Date(auctionStart).toLocaleString() %></strong></p>
+                <p>Auction End: <strong><%= new Date(auctionEnd).toLocaleString() %></strong></p>
+                <p>Session Time Left: <strong id="timer">Loading...</strong></p>
+            </div>
+
+            <!-- Leaderboard Section -->
+            <div class="leaderboard">
+                <% topBids.forEach((bid, index) => { %>
+                    <% if (index < 3) { %>
+                        <div class="card">
+                            <p><strong><%= index + 1 %></strong></p> <!-- Ranking Number -->
+                            <p>Name: <strong><%= bid.buyer.firstName ?? '' %> <%= bid.buyer.lastName ?? '' %></strong></p>
+                            <p>Phone: <%= bid.buyer.phoneNumber || 'N/A' %></p>
+                            <p>Currently Submit: <strong>&#128176; ₱<%= bid.bid %></strong></p>
+                        </div>
+                    <% } %>
+                <% }) %>
+            </div>
+
+        <!-- Submit Price Section -->
+        <div class="card">
+            <form action="" method="post">
+              <img src="/public<%= product.image %>" class="product-image" />
+            </a>
+            <div class="product-details">
+              <p>Product Name: <strong><%= product.name %></strong></p>
+              <p>
+                Product Seller:
+                <strong><%= sellerFirstName %> <%= sellerLastName %></strong>
+              </p>
+                <!-- Display Wholesale Quantity and Unit if it's a Wholesale Product -->
+            <% if (product.productType === 'wholesale' && product.wholesaleQuantity && product.wholesaleUnit) { %>
+                <p>Quantity: <strong><%= product.wholesaleQuantity %> <%= product.wholesaleUnit %></strong></p>
+            <% } %>
+              <p>Minimum Price: <strong>₱<%= product.minPrice %></strong></p>
+
+              <p>
+                Product Description: <strong><%= product.productInfo %></strong>
+              </p>
+            </div>
+            <h1>Submit Your Price</h1>
+            <input
+              type="hidden"
+              name="sellerId"
+              value="<%= product.seller._id %>"
+            />
+            <input type="hidden" name="productId" value="<%= product._id %>" />
+            <input
+              type="number"
+              id="submitPrice"
+              name="submitPrice"
+              placeholder="Enter Your Price"
+              style="font-size: 1.2rem; padding: 8px; width: 100%; max-width: 200px;"
+            />
+            <button class="btn" onclick="submitPrice()">Submit</button>
+          </form>
+        </div>
+      </div>
+
+        <!-- Other Bidders Section -->
+        <div class="other-bidders">
+            <h3>Other Bidders</h3>
+            <% topBids.forEach((bid, index) => { %>
+                <% if (index > 2) { %>
+                    <div class="bidder">
+                        <p>Rank: <strong><%= index + 1 %></strong></p>
+                        <p>Name: <strong><%= bid.buyer.firstName ?? '' %> <%= bid.buyer.lastName ?? '' %></strong></p>
+                        <p>Submitted Price: <strong>₱<%= bid.bid %></strong></p>
+                    </div>
+                <% } %>
+            <% }) %>
+        </div>
+
+    <!-- JavaScript -->
+    <script>
+        function leaveBid() {
+            window.location.href = "/buyer/index";
+        }
+
+        function startCountdown(auctionEndTime) {
+            function updateTimer() {
+                const now = new Date().getTime();
+                const endTime = new Date(auctionEndTime).getTime();
+                const remainingTime = endTime - now;
+                console.log('remainingTime',remainingTime)
+                if (remainingTime > 0) {
+                    let hours = Math.floor((remainingTime / (1000 * 60 * 60)) % 24);
+                    let minutes = Math.floor((remainingTime / (1000 * 60)) % 60);
+                    let seconds = Math.floor((remainingTime / 1000) % 60);
+
+                    hours = hours < 10 ? "0" + hours : hours;
+                    minutes = minutes < 10 ? "0" + minutes : minutes;
+                    seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                    document.getElementById("timer").textContent = hours + " : " + minutes + " : " + seconds;
+                } else {
+                    document.getElementById("timer").textContent = "Auction Ended";
+                    clearInterval(timerInterval);
+                }
+            }
+
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        window.onload = function () {
+            const auctionEndTime = "<%= auctionEnd %>"; // Pass from server
+            console.log('auctionEndTime',auctionEndTime)
+            startCountdown(auctionEndTime);
+        };
+    </script>
+</body>
+
+</html>

@@ -27,17 +27,58 @@
            
             <ul class="nav-links">
                 <!-- Edit Information Icon -->
-                <li><button class="edit-info-btn" onclick="editInformation()">
-                    <img src="/public/img/edit-user.png" alt="Edit Icon" class="edit-icon">
-                    <span class="icon-label">Edit Information</span> <!-- Label for Edit Icon -->
-                </button></li>
+                <li>
+                    <button class="edit-info-btn" onclick="openEditModal()">
+                        <img src="/public/img/edit-user.png" alt="Edit Icon" class="edit-icon">
+                        <span class="icon-label">Edit Information</span>
+                    </button>
+                </li>
+                
+                <!-- Profile Edit Modal -->
+                <div id="editInfoModal" class="modal">
+                    <form action="/updateUserInfo" method="POST" enctype="multipart/form-data">
+                        <button type="button" class="close-btn" onclick="closeEditModal()">✖</button>
+                         <label>Profile Picture:</label>
+                          <!-- Display existing profile picture -->
+                        <img id="editProfilePreview" src="/public/img/default-profile.png" alt="Profile Picture" width="100">
+                        <input type="file" id="editProfileImage" name="image" accept="image/*" onchange="previewEditImage(event)">
+                
+                       
+                        <label>First Name:</label>
+                        <input type="text" id="editFirstName" name="firstName" required>
+                
+                        <label>Last Name:</label>
+                        <input type="text" id="editLastName" name="lastName" required>
+                
+                        <label>Phone Number:</label>
+                        <input type="text" id="editPhoneNumber" name="phoneNumber" required>
+                
+                
+                       
+                
+                        <button type="submit">Update Profile</button>
+                    </form>
+                </div>
 
     
-                <!-- Currently Bids Icon -->
-                <li><button class="bids-btn" onclick="viewCurrentBids()">
-                    <img src="/public/img/clock_user.png" alt="Currently Bids Icon" class="bids-icon">
-                    <span class="icon-label">Currently in Bid</span> <!-- Label for Bids Icon -->
-                </button></li>
+                    <!-- Currently Bids Icon -->
+                <li>
+                    <button class="bids-btn" onclick="viewCurrentBids()">
+                        <img src="/public/img/clock_user.png" alt="Currently Bids Icon" class="bids-icon">
+                        <span class="icon-label">Currently in Bid</span>
+                    </button>
+                </li>
+
+                <!-- Modal for Displaying Current Bids -->
+                <div id="currentBidsModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal()">&times;</span>
+                        <h2>Current Auction Bids</h2>
+                        <div id="bidList">
+                            <!-- Auction items will be loaded here dynamically -->
+                        </div>
+                    </div>
+                </div>
             </ul>
             <!-- Dropdown Profile Container -->
             <div id="profileDropdown" class="profile-dropdown" style="display: none;">
@@ -58,12 +99,14 @@
                 </div>
             </div>
             <div class="search-container">
-                <input type="text" placeholder="Search for products...">
-                <button>Search</button>
-                <button class="cart-button">
-                    <img src="/public/img/ct.webp" alt="Cart Icon" class="cart-icon">
-                    <span class="cart-count">0</span>
+                <button id="notificationButton" class="notification-button">
+                    <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
+                    <span class="notification-count" id="notificationCount">
+                        <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
+                    </span>
                 </button>
+                
+     
                 <div class="settings-container">
                     <button class="settings-button" onclick="toggleSettingsDropdown()">
                         <img src="/public/img/settings.png" alt="Settings Icon" class="settings-icon">
@@ -113,127 +156,168 @@
         <section class="product-list">
             <!-- All Products Section -->
             <div id="all-products-section">
-                <h3>All Products</h3>
-        
+                
                 <!-- Retail Products -->
-                <% if (retailProducts.length > 0) { %>
-                    <h4>Retail Products</h4>
+                <% if (retailProducts && retailProducts.length > 0) { %>
+                    <h2>Retail Products</h2>
                     <div class="product-container">
-                        <% retailProducts.forEach(product => { %> 
-                            <div class="product">
-                                <div class="product-image-container">
-                                    <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
-                                        alt="<%= product.name %>" class="product-image">
+                        <% retailProducts.forEach(product => { %>
+                            <% if (product.status === 'approved') { %> <!-- Only show approved products -->
+                                <div class="product">
+                                    <div class="product-image-container">
+                                        <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
+                                            alt="<%= product.name %>" class="product-image">
+                                    </div>
+                                    <h4><%= product.name %></h4>
+                                    <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                    <p>Pickup Address: <%= product.pickupAddress || 'Not Available' %></p>
+                                    <button class="showbuyer" 
+                                        onclick="openBuyNowModal(
+                                            '<%= product._id %>', 
+                                            '<%= product.name %>', 
+                                            '<%= product.productType %>', 
+                                            '<%= product.productInfo %>', 
+                                            '<%= product.minPrice ? product.minPrice.toFixed(2) : `Not Available` %>', 
+                                            '<%= product.seller ? product.seller.firstName + `` + product.seller.lastName : `Unknown Seller` %>',
+                                            '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : `/public/img/default.png`%>'
+                                        )">
+                                        Buy Now
+                                    </button>
                                 </div>
-                                <h4><%= product.name %></h4>
-                                <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
-                                <button class="showbuyer" 
-                                    onclick="openBuyNowModal(
-                                        '<%= product._id %>', 
-                                        '<%= product.name %>', 
-                                        '<%= product.productType %>', 
-                                        '<%= product.productInfo %>', 
-                                        '<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %>', 
-                                        '<%= product.seller ? product.seller.firstName + ' ' + product.seller.lastName : 'Unknown Seller' %>',
-                                        '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>'
-                                    )">
-                                    Buy Now
-                                </button>
-                            </div>
+                            <% } %>
                         <% }) %>
                     </div>
                 <% } %>
-                    
+        
                 <!-- Wholesale Products -->
-                <% if (wholesaleProducts.length > 0) { %>
-                    <h4>Wholesale Products</h4>
+                <% if (wholesaleProducts && wholesaleProducts.length > 0) { %>
+                    <h2>Wholesale Products</h2>
                     <div class="product-container">
                         <% wholesaleProducts.forEach(product => { %>
-                            <div class="product">
-                                <div class="product-image-container">
-                                    <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
-                                        alt="<%= product.name %>" class="product-image">
-                                </div>
-                                <h4><%= product.name %></h4>
-                                <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
-                                <button class="participated" 
-                                    onclick="openParticipateModal(
-                                        '<%= product._id %>',
-                                        '<%= product.name %>',
-                                        '<%= product.productType %>',
-                                        '<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %>',
-                                        '<%= product.seller ? product.seller.firstName + ' ' + product.seller.lastName : 'Unknown Seller' %>',
-                                        '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>',
-                                        '<%= product.auctionStart %>',
-                                        '<%= product.auctionEnd %>'
-                                    )">
-                                    Participate
-                                </button>
-                            </div>
-                        <% }) %>
-                    </div>
-                <% } %>
-            </div>        
-        
-            <!-- Category-Based Products Section -->
-            <div id="category-products-section" style="display: none;">
-                <% groupedProducts.forEach(group => { %>
-                    <div class="category-section" data-category-id="<%= group.category._id %>">
-                        <h3><%= group.category.name %></h3>
-            
-                        <% if (group.retailProducts.length > 0) { %>
-                            <h4>Retail Products</h4>
-                            <div class="product-container">
-                                <% group.retailProducts.forEach(product => { %>  
-                                    <div class="product">
-                                        <div class="product-image-container">
-                                            <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
-                                                alt="<%= product.name %>" class="product-image">
-                                        </div>
-                                        <h4><%= product.name %></h4>
-                                        <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
-                                        <button class="showbuyer" 
-                                            onclick="openBuyNowModal(
-                                                '<%= product._id %>', 
-                                                '<%= product.name %>', 
-                                                '<%= product.productType %>', 
-                                                '<%= product.productInfo %>', 
-                                                '<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %>', 
-                                                '<%= product.seller ? product.seller.firstName + ' ' + product.seller.lastName : 'Unknown Seller' %>',
-                                                '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>'
-                                            )">
-                                            Buy Now
-                                        </button>
+                            <% if (product.status === 'approved') { %> <!-- Only show approved products -->
+                                <div class="product">
+                                    <div class="product-image-container">
+                                        <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
+                                            alt="<%= product.name %>" class="product-image">
                                     </div>
-                                <% }) %>
-                            </div>
-                        <% } %>
-            
-                        <% if (group.wholesaleProducts.length > 0) { %>
-                            <h4>Wholesale Products</h4>
-                            <div class="product-container">
-                                <% group.wholesaleProducts.forEach(product => { %>  
-                                    <div class="product">
-                                        <div class="product-image-container">
-                                            <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
-                                                alt="<%= product.name %>" class="product-image">
-                                        </div>
-                                        <h4><%= product.name %></h4>
-                                        <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                    <h4><%= product.name %></h4>
+                                    <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                    <!-- Display Wholesale Quantity and Unit (Only for Wholesale Products) -->
+                                    <% if (product.productType === 'wholesale' && product.wholesaleQuantity && product.wholesaleUnit) { %>
+                                        <p>Quantity: <%= product.wholesaleQuantity %> <%= product.wholesaleUnit %></p>
+                                    <% } %>
+                                    <p>Pickup Address: <%= product.pickupAddress || 'Not Available' %></p>
+                                    <%
+                                    const auctionEndTime = new Date(product.auctionEnd);
+                                    const currentTime = new Date();
+                                    const isAuctionEnded = currentTime >= auctionEndTime;
+                                    %>
+
+                                    <% if (!isAuctionEnded) { %>
                                         <button class="participated" 
                                             onclick="openParticipateModal(
                                                 '<%= product._id %>',
                                                 '<%= product.name %>',
                                                 '<%= product.productType %>',
-                                                '<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %>',
-                                                '<%= product.seller ? product.seller.firstName + ' ' + product.seller.lastName : 'Unknown Seller' %>',
-                                                '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>',
+                                                '<%= product.minPrice ? product.minPrice.toFixed(2) : `Not Available` %>',
+                                                '<%= product.seller ? product.seller.firstName + ` ` + product.seller.lastName : `Unknown Seller` %>',
+                                                '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : `/public/img/default.png` %>',
                                                 '<%= product.auctionStart %>',
                                                 '<%= product.auctionEnd %>'
                                             )">
                                             Participate
                                         </button>
-                                    </div>
+                                    <% } else { %>
+                                        <a class="ended" disabled>Ended</a>
+                                        <button class="show-winner" onclick="window.location.href='/buyer/auction/<%= product._id %>/results'">Show Winner</button>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- Category-Based Products Section -->
+            <div id="category-products-section" style="display: none;">
+                <% groupedProducts && groupedProducts.forEach(group => { %>
+                    <div class="category-section" data-category-id="<%= group.category._id %>">
+                        
+                        <% if (group.retailProducts && group.retailProducts.length > 0) { %>
+                            <h4>Retail Products</h4>
+                            <div class="product-container">
+                                <% group.retailProducts.forEach(product => { %>
+                                    <% if (product.status === 'approved') { %> <!-- Only show approved products -->
+                                        <div class="product">
+                                            <div class="product-image-container">
+                                                <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
+                                                    alt="<%= product.name %>" class="product-image">
+                                            </div>
+                                            <h4><%= product.name %></h4>
+                                            <p>Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                            <p>Pickup Address: <%= product.pickupAddress || 'Not Available' %></p>
+                                            <button class="showbuyer" 
+                                                onclick="openBuyNowModal(
+                                                    '<%= product._id %>', 
+                                                    '<%= product.name %>', 
+                                                    '<%= product.productType %>', 
+                                                    '<%= product.productInfo %>', 
+                                                    '<%= product.minPrice ? product.minPrice.toFixed(2) : `Not Available` %>', 
+                                                    '<%= product.seller ? product.seller.firstName + `` + product.seller.lastName : `Unknown Seller` %>',
+                                                    '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : `/public/img/default.png` %>'
+                                                )">
+                                                Buy Now
+                                            </button>
+                                        </div>
+                                    <% } %>
+                                <% }) %>
+                            </div>
+                        <% } %>
+        
+                        <% if (group.wholesaleProducts && group.wholesaleProducts.length > 0) { %>
+                            <h2>Wholesale Products</h2>
+                            <div class="product-container">
+                                <% group.wholesaleProducts.forEach(product => { %>
+                                    <% if (product.status === 'approved') { %> <!-- Only show approved products -->
+                                        <div class="product">
+                                            <div class="product-image-container">
+                                                <img src="<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : '/public/img/default.png' %>" 
+                                                    alt="<%= product.name %>" class="product-image">
+                                            </div>
+                                            <h4><%= product.name %></h4>
+                                            <p>Minimum Price: ₱<%= product.minPrice ? product.minPrice.toFixed(2) : 'Not Available' %></p>
+                                            <!-- Display Wholesale Quantity and Unit (Only for Wholesale Products) -->
+                                            <% if (product.productType === 'wholesale' && product.wholesaleQuantity && product.wholesaleUnit) { %>
+                                                <p>Quantity: <%= product.wholesaleQuantity %> <%= product.wholesaleUnit %></p>
+                                            <% } %>
+                                            <p>Pickup Address: <%= product.pickupAddress || 'Not Available' %></p>
+                                            
+                                            <%
+                                            const auctionEndTime = new Date(product.auctionEnd);
+                                            const currentTime = new Date();
+                                            const isAuctionEnded = currentTime >= auctionEndTime;
+                                            %>
+
+                                            <% if (!isAuctionEnded) { %>
+                                                <button class="participated" 
+                                                    onclick="openParticipateModal(
+                                                        '<%= product._id %>',
+                                                        '<%= product.name %>',
+                                                        '<%= product.productType %>',
+                                                        '<%= product.minPrice ? product.minPrice.toFixed(2) : `Not Available` %>',
+                                                        '<%= product.seller ? product.seller.firstName + ` ` + product.seller.lastName : `Unknown Seller` %>',
+                                                        '<%= product.image ? '/public/img/product/' + product.image.split('/').pop() : `/public/img/default.png` %>',
+                                                        '<%= product.auctionStart %>',
+                                                        '<%= product.auctionEnd %>'
+                                                    )">
+                                                    Participate
+                                                </button>
+                                            <% } else { %>
+                                                <a class="ended" disabled>Ended</a>
+                                                <button class="show-winner" onclick="window.location.href='/buyer/auction/<%= product._id %>/results'">Show Winner</button>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
                                 <% }) %>
                             </div>
                         <% } %>
@@ -241,13 +325,14 @@
                 <% }) %>
             </div>
         </section>
+        
                 
 
 
         <!-- Buy Now Modal -->
         <div id="buyNowModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
+                <span class="close" onclick="closebuyNowModal()">&times;</span>
                 <h2>Product Details</h2>
                 <!-- Product Image -->
                 <img id="modal-product-image" src="/img/default.png" alt="Product Image" style="width: 100%; max-height: 300px; object-fit: contain;">
@@ -280,25 +365,20 @@
                     <button type="submit">Confirm Participation</button>
                 </form>
                 <% if (messages.success) { %>
-                    <script>
-                        alert("<%= messages.success %>");
-                    </script>
+                    
                 <% } %>
             </div>
         </div>
-
+        <div id="flash-messages"
+            data-success="<%= messages.success ? messages.success[0] : '' %>"
+            data-error="<%= messages.error ? messages.error[0] : '' %>">
+        </div>
 
            
     </main>
-
     <footer>
         <div class="footer-left">
-            <button id="notificationButton" class="notification-button">
-                <img src="/public/img/bell.png" alt="Notification Icon" class="notification-icon">
-                <span class="notification-count" id="notificationCount">
-                    <%= notifications.filter(notification => notification.status === 'unread').length %> <!-- Count unread notifications -->
-                </span>
-            </button>
+            
         </div>
         
         <!-- Modal for notifications -->
@@ -311,7 +391,7 @@
                         <li id="notification-<%= notification._id %>" class="notification <%= notification.status === 'unread' ? 'unread' : 'read' %>">
                             <p><%= notification.message %></p>
                             <% if (notification.status === 'unread') { %>
-                                <a href="/farmer/notification?notification_id=<%= notification._id %>" class="btn btn-primary mark-as-read">
+                                <a href="/buyer/notification?notification_id=<%= notification._id %>" class="btn btn-primary mark-as-read">
                                     Seen
                                 </a>
                             <% } %>
@@ -328,10 +408,144 @@
             <img src="/public/img/clock.png" alt="Clock Icon" class="clock-icon">
             <span id="currentTime" class="current-time"></span>
         </div>
-        
         <p>&copy; 2024 PAO Market. All rights reserved.</p>
     </footer>
+
 <script>
+
+
+function openEditModal() {
+    document.getElementById("editInfoModal").style.display = "flex";
+}
+
+function closeEditModal() {
+    document.getElementById("editInfoModal").style.display = "none";
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    var modal = document.getElementById("editInfoModal");
+    if (event.target == modal) {
+        closeEditModal();
+    }
+}
+
+// Preview image before uploading
+function previewEditImage(event) {
+    var reader = new FileReader();
+    reader.onload = function () {
+        var output = document.getElementById("editProfilePreview");
+        output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+function openEditModal() {
+        fetch('/getUserInfo') // Fetch user info from the backend
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("editFirstName").value = data.firstName;
+                document.getElementById("editLastName").value = data.lastName;
+                document.getElementById("editPhoneNumber").value = data.phoneNumber;
+                
+                // Update profile picture preview
+                if (data.profilePicture) {
+                    document.getElementById("editProfilePreview").src = data.profilePicture;
+                }
+
+                document.getElementById("editInfoModal").style.display = "block";
+            })
+            .catch(error => console.error("Error fetching user data:", error));
+    }
+
+document.addEventListener('DOMContentLoaded', function() {
+               // Get the modal and notification button
+               const modal = document.getElementById("notificationModal");
+               const notificationButton = document.getElementById("notificationButton");
+               const closeModalButton = document.getElementById("closeModalButton");
+       
+               // Open the modal when the notification button is clicked
+               notificationButton.onclick = function() {
+                   modal.style.display = "block";
+               }
+       
+               // Close the modal when the close button is clicked
+               closeModalButton.onclick = function() {
+                   modal.style.display = "none";
+               }
+       
+               // Close the modal if the user clicks outside of the modal
+               window.onclick = function(event) {
+                   if (event.target == modal) {
+                       modal.style.display = "none";
+                   }
+               }
+       
+               // Attach event listeners for each "close" button in the notification list
+               const closeButtons = document.querySelectorAll('.close-notification');
+               closeButtons.forEach(button => {
+                   button.addEventListener('click', function(event) {
+                       const notificationId = event.target.getAttribute('data-notification-id');
+                       closeNotification(notificationId);
+                   });
+               });
+           });
+       
+           // Function to close individual notification
+           // Close notification and hide it temporarily using localStorage
+       function closeNotification(notificationId) {
+           // Save the closed notification ID to localStorage
+           let closedNotifications = JSON.parse(localStorage.getItem('closedNotifications')) || [];
+           closedNotifications.push(notificationId);
+           localStorage.setItem('closedNotifications', JSON.stringify(closedNotifications));
+       
+           // Hide the notification element on the page
+           const notificationElement = document.getElementById(`notification-${notificationId}`);
+           notificationElement.style.display = 'none';
+       }
+       // Check localStorage for closed notifications and hide them on page load
+       window.onload = function() {
+           const closedNotifications = JSON.parse(localStorage.getItem('closedNotifications')) || [];
+       
+           // Hide all closed notifications
+           closedNotifications.forEach(notificationId => {
+               const notificationElement = document.getElementById(`notification-${notificationId}`);
+               if (notificationElement) {
+                   notificationElement.style.display = 'none';
+               }
+           });
+       };
+
+    // Farmer approves order and sets pickup address
+    document.querySelectorAll(".approve-order").forEach(button => {
+        button.addEventListener("click", function () {
+            const orderId = this.getAttribute("data-order-id");
+            const pickupAddress = document.getElementById(`pickup-address-${orderId}`).value;
+
+            if (!pickupAddress) {
+                alert("Please enter a pickup address.");
+                return;
+            }
+
+            fetch(`/farmer/approve-order/${orderId}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pickupAddress })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Order approved! Buyer has been notified.");
+                } else {
+                    alert("Error approving order.");
+                }
+            })
+            .catch(error => console.error("Error:", error));
+        });
+    });
+
+
+
+// ✅ Function to send reply
 // Toggle profile dropdown visibility
 function toggleProfileDropdown() {
     const dropdown = document.getElementById("profileDropdown");
@@ -367,6 +581,10 @@ window.onclick = function(event) {
         closeModal();
     }
 }
+function searchProducts() {
+    console.log("Search button clicked");
+}
+
 function updateClock() {
     const currentTime = document.getElementById('currentTime');
     const now = new Date();
@@ -488,7 +706,7 @@ function openBuyNowModal(id, name, type, description, price, seller, image) {
 }
 
 // Function to close the modal
-function closeModal() {
+function closebuyNowModal() {
     document.getElementById('buyNowModal').style.display = 'none';
 }
 
@@ -509,13 +727,23 @@ function confirmBuyNow() {
     const productId = document.getElementById('productName').getAttribute('data-product-id'); 
     const quantity = Number(document.getElementById('quantity').value);
     const pricePerKilo = Number(document.getElementById('productPrice').innerText); 
+    const modal = document.getElementById('buyNowModal'); // Get the modal
 
     if (!productId || quantity < 1 || isNaN(pricePerKilo) || pricePerKilo <= 0) {
-        alert("Invalid quantity, product, or price.");
+        Swal.fire({
+            icon: "warning",
+            title: "Invalid Input",
+            text: "Please enter a valid quantity and ensure the product and price are correct."
+        });
         return;
     }
 
     const totalPrice = quantity * pricePerKilo;
+
+    // Close the custom modal
+    if (modal) {
+        modal.style.display = "none"; // Hide the modal
+    }
 
     fetch('/buyer/confirm-purchase', {
         method: 'POST',
@@ -525,15 +753,30 @@ function confirmBuyNow() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert("Purchase successful!");
-            window.location.reload();
+            // Show success message after modal disappears
+            Swal.fire({
+                icon: "success",
+                title: "Purchase Successful",
+                text: "Your order has been placed successfully!",
+                showConfirmButton: true
+            }).then(() => {
+                window.location.reload(); // Reload page after confirmation
+            });
         } else {
-            alert("Error: " + data.message);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: data.message
+            });
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert("Failed to confirm purchase.");
+        Swal.fire({
+            icon: "error",
+            title: "Failed",
+            text: "Failed to confirm purchase. Please try again."
+        });
     });
 }
 
@@ -601,11 +844,107 @@ function formatTime(dateTime) {
     return date.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit', hour12: true });
 }
 
+function viewCurrentBids() {
+    fetch('/buyer/current-bids')
+        .then(response => response.json())
+        .then(data => {
+            const bidList = document.getElementById('bidList');
+            bidList.innerHTML = '';
+
+            if (data.success && data.bids.length > 0) {
+                data.bids.forEach(bid => {
+                    console.log('bid', bid.auctionEnd)
+                    const auctionStartTime = bid.auctionStart ?? null;
+                    const auctionEndTime = bid.auctionEnd ?? null;
+                    const now = new Date();
+
+                    let auctionStatus = '';
+                    let auctionButton = '';
+
+                    // if (!auctionStartTime || !auctionEndTime) {
+                    //     auctionStatus = `<p class="error">Auction schedule not available.</p>`;
+                    //     auctionButton = `<button disabled class="disabled-btn">No Auction Data</button>`;
+                    // } else if (now < auctionStartTime) {
+                    //     auctionStatus = `<p class="upcoming">Auction starts on: ${auctionStartTime.toLocaleString()}</p>`;
+                    //     auctionButton = `<button disabled class="disabled-btn">Auction Not Started</button>`;
+                    // } else if (now >= auctionStartTime && now <= auctionEndTime) {
+                    //     auctionStatus = `<p class="ongoing">Auction is Live!</p>`;
+                    //     auctionButton = `<button onclick="joinAuction('${bid.auctionId}')">Join Auction</button>`;
+                    // } else {
+                    //     auctionStatus = `<p class="ended">Auction Ended</p>`;
+                    //     auctionButton = `<button disabled class="disabled-btn">Auction Ended</button>`;
+                    // }
+
+                    const bidItem = `
+                        <div class="bid-item">
+                            <img src="/public${bid.productImage}" alt="Product Image" class="bid-product-img" style="width: 100%; height: auto; max-height: 300px; object-fit: contain; display: block; margin: auto;"> 
+                            <h3>${bid.productName}</h3>
+                            <p>Description: ${bid.productDescription}</p>
+                            <p>Minimum Price: ₱${bid.minimumPrice}</p>
+                            <p>Seller: ${bid.sellerName}</p>
+                        
+                            <p class="ongoing">Auction is Live!</p>
+                       <a href="auction/room/${bid.pId}" style="background-color: green; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer;">
+                        Join Auction
+                        </a>
+
+                        </div>
+                    `;
+                    bidList.innerHTML += bidItem;
+                });
+            } else {
+                bidList.innerHTML = '<p>No active bids found.</p>';
+            }
+
+            document.getElementById('currentBidsModal').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error fetching bids:', error);
+            alert('Failed to load auction bids. Please try again.');
+        });
+}
+
+function closeModal() {
+    document.getElementById('currentBidsModal').style.display = 'none';
+}
+
+function joinAuction(auctionId) {
+    if (!auctionId) {
+        alert('Invalid auction session.');
+        return;
+    }
+    window.location.href = `/buyer/auction/session/${auctionId}`;
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("notificationModal");
+    const notificationButton = document.getElementById("notificationButton");
+    const closeModalButton = document.getElementById("closeModalButton");
+
+    // Open modal when notification button is clicked
+    notificationButton.addEventListener("click", function () {
+        modal.style.display = "block";
+    });
+
+    // Close modal when close button is clicked
+    closeModalButton.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside of modal content
+    window.addEventListener("click", function (event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+});
 
 
 </script>
-
-    <script src="/public/js/scripts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/public/js/messagescript.js"></script>
+  
  
 </body>
 </html>

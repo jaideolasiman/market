@@ -25,6 +25,8 @@ var schema = mongoose.Schema({
     },
     profilePicture: {
         type: String, 
+        default: "default-profile.png" // 👈 Set a default profile picture
+        
     },
     gender: {
         type: String,

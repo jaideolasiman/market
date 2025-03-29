@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Result Page</title>
+    <style>
+        /* Global Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    margin: 20px auto;
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Banner */
+.banner {
+    background: #1992f5;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.8rem;
+    position: relative;
+}
+
+.banner a {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #1a3553;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.banner a:hover {
+    background-color: #035214;
+    transform: scale(1.05);
+}
+
+.banner a:active {
+    background-color: #00408d;
+}
+
+/* Content Layout */
+.content {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    flex-wrap: wrap; /* Ensures content stacks on smaller screens */
+}
+
+.product-info, .winner-info, .bid-ranking {
+    width: 30%;
+    background: #f1f1f1;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Product Image and Winner Profile */
+.product-info img, .winner-info img {
+    width: 80%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+/* Heading for Sections */
+h2 {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+/* Table for Bid Ranking */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #0e5ec5;
+    color: white;
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 1rem;
+    background: #f5f5f5;
+}
+
+/* Responsive Styles for Mobile Devices */
+@media screen and (max-width: 768px) {
+    /* Adjust banner font size */
+    .banner h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Stack content vertically for smaller screens */
+    .content {
+        flex-direction: column;
+    }
+
+    /* Adjust product info, winner info, and bid ranking to fit better */
+    .product-info, .winner-info, .bid-ranking {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    /* Adjust font size for mobile screens */
+    .product-info p, .winner-info p, .bid-ranking h2 {
+        font-size: 1rem;
+    }
+
+    /* Reduce padding on smaller screens */
+    .container {
+        width: 95%;
+        margin: 10px auto;
+    }
+}
+
+/* Further adjustments for very small screens (phones) */
+@media screen and (max-width: 480px) {
+    /* Banner font size */
+    .banner h1 {
+        font-size: 1.2rem;
+    }
+
+    /* Make back button smaller and more accessible */
+    .banner a {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+    }
+
+    /* Smaller font sizes for content */
+    .product-info p, .winner-info p, .bid-ranking h2 {
+        font-size: 0.9rem;
+    }
+
+    .footer {
+        font-size: 0.9rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="banner">
+            <h1>🏆 Auction Result 🏆</h1>
+            <a href="javascript:history.back()">Back</a>
+        </div>
+        <div class="content">
+            <div class="product-info">
+                <h2>Product Information</h2>
+                <% if (auctionSession && auctionSession.length > 0) { %>
+                    <img src="/public/<%= auctionSession[0].product.image || '/default.jpg' %>" alt="<%= auctionSession[0].product.name %>">
+                    <p><strong>Name:</strong> <%= auctionSession[0].product.name %></p>
+                    <p><strong>Description:</strong> <%= auctionSession[0].product.productInfo || 'N/A' %></p>
+                    <p><strong>Starting Price:</strong> ₱<%= auctionSession[0].product.minPrice %></p>
+                    
+                <% } else { %>
+                    <p>No product data available</p>
+                <% } %>
+            </div>
+
+            <div class="winner-info">
+                <h1>🏆 Winner 🏆</h1>
+                <% if (winner) { %>
+                    <img src="<%= winner.image || '/default.jpg' %>" alt="Winner Profile Picture">
+                    <p><strong>Name:</strong> <%= winner.bidder %></p>
+                    <p><strong>Phone:</strong> <%= winner.phone %></p>
+                    <p><strong>Winning Bid:</strong> ₱<%= winner.bidAmount %></p>
+                <% } else { %>
+                    <p>No winner yet</p>
+                <% } %>
+            </div>
+
+            <div class="bid-ranking">
+                <h2>Bid Ranking</h2>
+                <table>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Bid Price</th>
+                    </tr>
+                    <% if (highestBid && highestBid.length > 1) { %>
+                        <% highestBid.forEach((bid, index) => { %>
+                            <% if (index > 0) { %> <!-- Skip the winner -->
+                                <tr>
+                                    <td><%= bid.rank %></td>  <!-- Rank starts at 2 -->
+                                    <td><%= bid.bidder %></td>
+                                    <td>₱<%= bid.bidAmount %></td>
+                                </tr>
+                            <% } %>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No additional bids</td>
+                        </tr>
+                    <% } %>
+                </table>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Congratulations to the winner! Thank you for participating in the auction.</p>
+        </div>
+    </div>
+</body>
+</html>
