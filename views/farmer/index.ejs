@@ -39,27 +39,39 @@
                 
                 <!-- Profile Edit Modal -->
                 <div id="editInfoModal" class="modal">
-                    
                     <form action="/updateUserInfo" method="POST" enctype="multipart/form-data">
                         <button type="button" class="close-btn" onclick="closeEditModal()">✖</button>
-                         <label>Profile Picture:</label>
-                         <!-- Display existing profile picture -->
+
+                        <!-- Profile Picture -->
+                        <label>Profile Picture:</label>
                         <img id="editProfilePreview" src="/public/img/default-profile.png" alt="Profile Picture" width="100">
                         <input type="file" id="editProfileImage" name="image" accept="image/*" onchange="previewEditImage(event)">
-                
-                        
+
+                        <!-- First Name -->
                         <label>First Name:</label>
                         <input type="text" id="editFirstName" name="firstName" required>
-                
+
+                        <!-- Last Name -->
                         <label>Last Name:</label>
                         <input type="text" id="editLastName" name="lastName" required>
-                
+
+                        <!-- Phone Number -->
                         <label>Phone Number:</label>
                         <input type="text" id="editPhoneNumber" name="phoneNumber" required>
-                
-                
-                       
-                
+
+                        <!-- Password Fields -->
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" placeholder="(Optional)">
+                        
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="(Optional)" onkeyup="validatePassword()">
+                        
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="(Optional)" onkeyup="validatePassword()">
+
+                        <p id="passwordError" style="color: red; display: none;">Passwords do not match!</p>
+
+                        <!-- Submit Button -->
                         <button type="submit">Update Profile</button>
                     </form>
                 </div>
@@ -272,9 +284,7 @@
             <textarea id="productInfo" name="productInfo" rows="4" required></textarea><br><br>
 
             <!-- Wholesale Fields (Initially Hidden) -->
-            <div id="wholesaleFields" style="display: none;">
-                
-
+            <div id="wholesaleFields" style="display: none;">              
                 <label for="wholesaleUnit">Unit</label>
                 <select id="wholesaleUnit" name="wholesaleUnit">
                     <option value="kg">Kilograms (kg)</option>
@@ -494,13 +504,6 @@
                 
             </div>
         </div>
-        
-    
-        <div class="footer-right">
-            <img src="/public/img/clock.png" alt="Clock Icon" class="clock-icon">
-            <span id="currentTime" class="current-time"></span>
-        </div>
-        
         <p>&copy; 2024 PAO Market. All rights reserved.</p>
     </footer>
     <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>-->
@@ -519,10 +522,22 @@ function toggleAuctionFields(isWholesale) {
     document.getElementById("wholesaleFields").style.display = isWholesale ? "block" : "none";
 }
 
-
-
 function openEditModal() {
-    document.getElementById("editInfoModal").style.display = "flex";
+    fetch('/getUserInfo') // Fetch user info from the backend
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("editFirstName").value = data.firstName;
+            document.getElementById("editLastName").value = data.lastName;
+            document.getElementById("editPhoneNumber").value = data.phoneNumber;
+            
+            // Update profile picture preview
+            if (data.profilePicture) {
+                document.getElementById("editProfilePreview").src = data.profilePicture;
+            }
+
+            document.getElementById("editInfoModal").style.display = "flex";
+        })
+        .catch(error => console.error("Error fetching user data:", error));
 }
 
 function closeEditModal() {
@@ -546,23 +561,39 @@ function previewEditImage(event) {
     };
     reader.readAsDataURL(event.target.files[0]);
 }
-function openEditModal() {
-        fetch('/getUserInfo') // Fetch user info from the backend
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById("editFirstName").value = data.firstName;
-                document.getElementById("editLastName").value = data.lastName;
-                document.getElementById("editPhoneNumber").value = data.phoneNumber;
-                
-                // Update profile picture preview
-                if (data.profilePicture) {
-                    document.getElementById("editProfilePreview").src = data.profilePicture;
-                }
 
-                document.getElementById("editInfoModal").style.display = "block";
-            })
-            .catch(error => console.error("Error fetching user data:", error));
+// Real-time password validation
+function validatePassword() {
+    var newPassword = document.getElementById("newPassword").value;
+    var confirmPassword = document.getElementById("confirmPassword").value;
+    var passwordError = document.getElementById("passwordError");
+
+    if (newPassword !== confirmPassword) {
+        passwordError.style.display = "block";
+    } else {
+        passwordError.style.display = "none";
     }
+}
+
+// Prevent form submission if passwords don't match
+document.getElementById("editProfileForm").addEventListener("submit", async function (event) {
+    event.preventDefault(); // Prevent form from refreshing the page
+
+    const formData = new FormData(this);
+    const response = await fetch("/updateUserInfo", {
+        method: "POST",
+        body: formData
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        alert("Profile updated successfully!");
+        window.location.href = result.redirectUrl; // Redirect based on user role
+    } else {
+        alert(result.message);
+    }
+});
+
 
         //function showBuyers(productId) {
            //console.log("Sending request for Product ID:", productId); // ✅ Debugging log

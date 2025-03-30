@@ -40,21 +40,25 @@ module.exports.getUserInfo = async (req, res) => {
 module.exports.updateUserInfo = async (req, res) => {
   try {
     if (!req.session.login) {
-      return res.status(401).json({ message: "User not logged in" });
+      req.flash("error", "User not logged in");
+      return res.redirect("/login");
     }
 
     upload(req, res, async function (err) {
       if (err) {
         console.error("File upload error:", err);
-        return res.status(500).json({ message: "File upload error", error: err.message });
+        req.flash("error", "File upload failed.");
+        return res.redirect("back"); // Redirect back to the same page
       }
 
       const user = await User.findById(req.session.login);
       if (!user) {
-        return res.status(404).json({ message: "User not found" });
+        req.flash("error", "User not found");
+        return res.redirect("back");
       }
 
-      const { firstName, lastName, phoneNumber, password, newPassword } = req.body;
+      const { firstName, lastName, phoneNumber, currentPassword, newPassword } = req.body;
+
       if (firstName) user.firstName = firstName;
       if (lastName) user.lastName = lastName;
       if (phoneNumber) user.phoneNumber = phoneNumber;
@@ -67,15 +71,15 @@ module.exports.updateUserInfo = async (req, res) => {
             fs.unlinkSync(oldImagePath);
           }
         }
-
         user.profilePicture = `/public/img/profile/${req.file.filename}`;
       }
 
-      // Handle Password Update
-      if (password && newPassword) {
-        const isMatch = await bcrypt.compare(password, user.password);
+      // Handle Password Update (Optional)
+      if (currentPassword && newPassword) {
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-          return res.status(400).json({ message: "Current password is incorrect" });
+          req.flash("error", "Current password is incorrect.");
+          return res.redirect("back");
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -83,12 +87,26 @@ module.exports.updateUserInfo = async (req, res) => {
       }
 
       await user.save();
-      console.log("Updated User:", user);
 
-      res.redirect("/buyer/index");
+      req.flash("success", "Profile updated successfully!");
+
+      // ✅ Redirect based on user role
+      if (user.role === "buyer") {
+        return res.redirect("/buyer/index");
+      } else if (user.role === "farmer") {
+        return res.redirect("/farmer/index");
+      } else if (user.role === "admin") {
+        return res.redirect("/admin/index");
+      } else {
+        return res.redirect("/"); // Default redirect
+      }
+
     });
   } catch (error) {
     console.error("Update Error:", error);
-    return res.status(500).json({ message: "Server error", error: error.message });
+    req.flash("error", "Something went wrong. Please try again.");
+    return res.redirect("back");
   }
 };
+
+

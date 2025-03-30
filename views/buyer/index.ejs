@@ -38,24 +38,37 @@
                 <div id="editInfoModal" class="modal">
                     <form action="/updateUserInfo" method="POST" enctype="multipart/form-data">
                         <button type="button" class="close-btn" onclick="closeEditModal()">✖</button>
-                         <label>Profile Picture:</label>
-                          <!-- Display existing profile picture -->
+
+                        <!-- Profile Picture -->
+                        <label>Profile Picture:</label>
                         <img id="editProfilePreview" src="/public/img/default-profile.png" alt="Profile Picture" width="100">
                         <input type="file" id="editProfileImage" name="image" accept="image/*" onchange="previewEditImage(event)">
-                
-                       
+
+                        <!-- First Name -->
                         <label>First Name:</label>
                         <input type="text" id="editFirstName" name="firstName" required>
-                
+
+                        <!-- Last Name -->
                         <label>Last Name:</label>
                         <input type="text" id="editLastName" name="lastName" required>
-                
+
+                        <!-- Phone Number -->
                         <label>Phone Number:</label>
                         <input type="text" id="editPhoneNumber" name="phoneNumber" required>
-                
-                
-                       
-                
+
+                        <!-- Password Fields -->
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" placeholder="(Optional)">
+                        
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="(Optional)" onkeyup="validatePassword()">
+                        
+                        <label for="confirmPassword">Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="(Optional)" onkeyup="validatePassword()">
+
+                        <p id="passwordError" style="color: red; display: none;">Passwords do not match!</p>
+
+                        <!-- Submit Button -->
                         <button type="submit">Update Profile</button>
                     </form>
                 </div>
