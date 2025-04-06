@@ -88,7 +88,7 @@ module.exports = function (app) {
   app.get('/buyer/index', buyerIndexController.index);
   app.get('/buyer/getNotifications', buyerIndexController.getNotifications);
   app.post('/buyer/confirm-purchase', buyerIndexController.confirmPurchase);
-  app.post('/buyer/getProducts', orderController.getProducts);
+  app.post('/buyer/getProducts', buyerIndexController.getProducts);
   app.post('/buyer/confirm-participation', buyerIndexController.confirmParticipation);
   app.get('/buyer/current-bids', buyerIndexController.getCurrentBids);
   app.get('/buyer/auction/room/:productId', currentbidController.index);

@@ -50,7 +50,7 @@ module.exports.results = async (req, res) => {
       
 
       if (!existingNotification) {
-        const notification = new Notification({
+        const notification = await Notification.findOne({
           user: winner.buyerId,
           product: auctionSession[0].product._id,  // Store product reference
           message: `🎉 Congratulations! You won the auction for "${auctionSession[0].product.name}" with a bid of ₱${winner.bidAmount}. The product is ready for pickup. Contact the seller to complete the transaction.`,

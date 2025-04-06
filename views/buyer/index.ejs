@@ -8,11 +8,13 @@
     <meta name="author" content="">
     <title> Buyer Web Page</title>
     <!-- Custom fonts for this template-->
-    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="/public/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
     <link rel="stylesheet" href="/public/css/style.css">
+    <link rel="stylesheet" href="/public/css/stylemodal.css">
+
 <body>
     <header>
         <nav class="navbar">
@@ -40,38 +42,56 @@
                         <button type="button" class="close-btn" onclick="closeEditModal()">✖</button>
 
                         <!-- Profile Picture -->
-                        <label>Profile Picture:</label>
-                        <img id="editProfilePreview" src="/public/img/default-profile.png" alt="Profile Picture" width="100">
-                        <input type="file" id="editProfileImage" name="image" accept="image/*" onchange="previewEditImage(event)">
+                        <div class="profile-section">
+                            <label>Profile Picture:</label>
+                            <img id="editProfilePreview" src="/public/img/default-profile.png" alt="Profile Picture">
+                            <input type="file" id="editProfileImage" name="image" accept="image/*" onchange="previewEditImage(event)">
+                        </div>
 
                         <!-- First Name -->
-                        <label>First Name:</label>
-                        <input type="text" id="editFirstName" name="firstName" required>
+                        <div class="form-group">
+                            <label for="editFirstName">First Name:</label>
+                            <input type="text" id="editFirstName" name="firstName" required>
+                        </div>
 
                         <!-- Last Name -->
-                        <label>Last Name:</label>
-                        <input type="text" id="editLastName" name="lastName" required>
+                        <div class="form-group">
+                            <label for="editLastName">Last Name:</label>
+                            <input type="text" id="editLastName" name="lastName" required>
+                        </div>
 
                         <!-- Phone Number -->
-                        <label>Phone Number:</label>
-                        <input type="text" id="editPhoneNumber" name="phoneNumber" required>
+                        <div class="form-group">
+                            <label for="editPhoneNumber">Phone Number:</label>
+                            <input type="text" id="editPhoneNumber" name="phoneNumber" required>
+                        </div>
 
                         <!-- Password Fields -->
-                        <label for="currentPassword">Current Password</label>
-                        <input type="password" id="currentPassword" name="currentPassword" placeholder="(Optional)">
-                        
-                        <label for="newPassword">New Password</label>
-                        <input type="password" id="newPassword" name="newPassword" placeholder="(Optional)" onkeyup="validatePassword()">
-                        
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="(Optional)" onkeyup="validatePassword()">
+                        <div class="form-group password-container">
+                            <label for="currentPassword">Current Password (Optional):</label>
+                            <input type="password" id="currentPassword" name="currentPassword">
+                            <span class="toggle-password" onclick="togglePassword('currentPassword')">👁️</span>
+                        </div>
 
-                        <p id="passwordError" style="color: red; display: none;">Passwords do not match!</p>
+                        <div class="form-group password-container">
+                            <label for="newPassword">New Password (Optional):</label>
+                            <input type="password" id="newPassword" name="newPassword" onkeyup="validatePassword()">
+                            <span class="toggle-password" onclick="togglePassword('newPassword')">👁️</span>
+                        </div>
+
+                        <div class="form-group password-container">
+                            <label for="confirmPassword">Confirm Password (Optional):</label>
+                            <input type="password" id="confirmPassword" name="confirmPassword" onkeyup="validatePassword()">
+                            <span class="toggle-password" onclick="togglePassword('confirmPassword')">👁️</span>
+                        </div>
 
                         <!-- Submit Button -->
-                        <button type="submit">Update Profile</button>
+                        <div class="button-container">
+                            <button type="submit">Update Profile</button>
+                        </div>
                     </form>
                 </div>
+
 
     
                     <!-- Currently Bids Icon -->
@@ -158,12 +178,11 @@
                 <% } else { %>
                     <span>No categories available</span>
                 <% } %>
-            </div>
-        
-            <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search for a product..." onkeyup="searchProducts()">
-                <button>Search</button>
-            </div>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search for a product..." onkeyup="searchProducts()">
+                    <button>Search</button>
+                </div>
+            </div> 
         </div>    
         
         <section class="product-list">
@@ -339,9 +358,7 @@
             </div>
         </section>
         
-                
-
-
+        
         <!-- Buy Now Modal -->
         <div id="buyNowModal" class="modal">
             <div class="modal-content">
@@ -418,13 +435,16 @@
         </div>
         
         <div class="footer-right">
-            <img src="/public/img/clock.png" alt="Clock Icon" class="clock-icon">
-            <span id="currentTime" class="current-time"></span>
         </div>
         <p>&copy; 2024 PAO Market. All rights reserved.</p>
     </footer>
 
 <script>
+
+function togglePassword(fieldId) {
+    var field = document.getElementById(fieldId);
+    field.type = field.type === "password" ? "text" : "password";
+}
 
 
 function openEditModal() {
@@ -622,7 +642,7 @@ window.onclick = function(event) {
     }
 };
 // Simulate user authentication state
-let isLoggedIn = false; // Change this to `true` to simulate a logged-in user
+let isLoggedIn = true; // Change this to `true` to simulate a logged-in user
 
 
 document.getElementById('closeModal').addEventListener('click', closeModal);
@@ -701,13 +721,19 @@ window.onload = function() {
 
     setInterval(fetchNotifications, 5000); // Refresh every 5 seconds
 
+    // To open the modal
+document.getElementById('buyNowModal').style.display = 'block';
+
+// To close the modal
+document.getElementById('buyNowModal').style.display = 'none';
+
  // Function to open the Buy Now modal with product details
 function openBuyNowModal(id, name, type, description, price, seller, image) {
     document.getElementById('productName').textContent = name;
     document.getElementById('productName').setAttribute('data-product-id', id);
     document.getElementById('productType').textContent = type;
     document.getElementById('productDescription').textContent = description;
-    document.getElementById('productPrice').textContent = price;
+    document.getElementById('productPrice').textContent = price.toFixed(2); // Ensure price is formatted
     document.getElementById('productSeller').textContent = seller;
     document.getElementById('modal-product-image').src = image;
     
@@ -715,15 +741,16 @@ function openBuyNowModal(id, name, type, description, price, seller, image) {
     document.getElementById('quantity').value = 1;
     updateTotalPrice();
     
+    // Show the modal
     document.getElementById('buyNowModal').style.display = "block";
 }
 
-// Function to close the modal
-function closebuyNowModal() {
+// Close the 'Buy Now' modal
+function closeBuyNowModal() {
     document.getElementById('buyNowModal').style.display = 'none';
 }
 
-// Function to update total price based on quantity input
+// Update the total price based on quantity input
 function updateTotalPrice() {
     const pricePerKilo = parseFloat(document.getElementById('productPrice').innerText) || 0;
     const quantity = parseInt(document.getElementById('quantity').value) || 1;
@@ -732,16 +759,17 @@ function updateTotalPrice() {
     document.getElementById('totalPrice').innerText = totalPrice.toFixed(2);
 }
 
-// Ensure total price updates when quantity changes
+// Listen for changes in quantity and update the total price accordingly
 document.getElementById('quantity').addEventListener('input', updateTotalPrice);
 
-// Function to confirm purchase
+// Confirm the purchase action
 function confirmBuyNow() {
     const productId = document.getElementById('productName').getAttribute('data-product-id'); 
     const quantity = Number(document.getElementById('quantity').value);
     const pricePerKilo = Number(document.getElementById('productPrice').innerText); 
-    const modal = document.getElementById('buyNowModal'); // Get the modal
+    const modal = document.getElementById('buyNowModal');
 
+    // Validate inputs
     if (!productId || quantity < 1 || isNaN(pricePerKilo) || pricePerKilo <= 0) {
         Swal.fire({
             icon: "warning",
@@ -753,11 +781,12 @@ function confirmBuyNow() {
 
     const totalPrice = quantity * pricePerKilo;
 
-    // Close the custom modal
+    // Close the modal
     if (modal) {
-        modal.style.display = "none"; // Hide the modal
+        modal.style.display = "none";
     }
 
+    // Send purchase request
     fetch('/buyer/confirm-purchase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -766,7 +795,7 @@ function confirmBuyNow() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Show success message after modal disappears
+            // Show success message
             Swal.fire({
                 icon: "success",
                 title: "Purchase Successful",
@@ -779,7 +808,7 @@ function confirmBuyNow() {
             Swal.fire({
                 icon: "error",
                 title: "Error",
-                text: data.message
+                text: data.message || "Something went wrong, please try again."
             });
         }
     })
@@ -793,55 +822,74 @@ function confirmBuyNow() {
     });
 }
 
-
-
+// Open the 'Participate in Auction' modal and set product details
 function openParticipateModal(productId, name, productType, minPrice, seller, image, startTime, endTime) {
-    // Set productId inside the hidden input field  
     document.getElementById("productId").value = productId;
     document.getElementById("auctionProductName").textContent = name;
     document.getElementById("auctionProductType").textContent = productType;
-    document.getElementById("auctionProductPrice").textContent = minPrice;
+    document.getElementById("auctionProductPrice").textContent = minPrice.toFixed(2);
     document.getElementById("auctionProductSeller").textContent = seller;
     document.getElementById("modal-auction-image").src = image;
 
-    // Format and display start and end times with both date and time
+    // Format and display start and end times
     document.getElementById("auctionStartTime").textContent = formatDateTime(startTime);
     document.getElementById("auctionEndTime").textContent = formatDateTime(endTime);
 
+    // Show the modal
     document.getElementById("participateModal").style.display = "block";
 }
 
-// Function to format date and time properly
+// Format date and time for better readability
 function formatDateTime(dateTime) {
     const date = new Date(dateTime);
     return date.toLocaleString(); // Formats as "MM/DD/YYYY, HH:MM:SS AM/PM"
 }
 
-// Close modal function
+// Close the 'Participate in Auction' modal
 function closeParticipateModal() {
     document.getElementById("participateModal").style.display = "none";
 }
 
-// Handle participation form submission with AJAX
+// Handle the participation form submission with AJAX
 document.getElementById("participationForm").addEventListener("submit", async function(event) {
     event.preventDefault(); // Prevent default form submission
 
     const productId = document.getElementById("productId").value;
 
-    const response = await fetch("/buyer/confirm-participation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ productId })
-    });
+    try {
+        const response = await fetch("/buyer/confirm-participation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId })
+        });
 
-    const result = await response.json();
-    if (result.success) {
-        alert("Participation confirmed!");
-        window.location.href = "/buyer/index.ejs"; // Redirect to index page
-    } else {
-        alert(result.message);
+        const result = await response.json();
+        if (result.success) {
+            Swal.fire({
+                icon: "success",
+                title: "Participation Confirmed",
+                text: "You have successfully participated in the auction.",
+                showConfirmButton: true
+            }).then(() => {
+                window.location.href = "/buyer/index.ejs"; // Redirect to buyer's main page
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: result.message || "Failed to confirm participation, please try again."
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "There was an issue confirming your participation. Please try again."
+        });
     }
 });
+
 
 // Function to format date (YYYY-MM-DD to readable format)
 function formatDate(dateTime) {

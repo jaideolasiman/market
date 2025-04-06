@@ -173,14 +173,16 @@ body {
 }
 
 .search-container input {
-    padding: 8px;
+    align-items: center;
+    padding: 8px 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 200px;
+    width: 100px;
 }
 
 .search-container button {
-    padding: 8px 12px;
+    align-items: center;
+    padding: 8px 10px;
     background-color: #28a745;
     color: white;
     border: none;
@@ -192,7 +194,7 @@ body {
     background-color: #218838;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 750px) {
     .category-bar {
         flex-direction: column;
         align-items: flex-start;
@@ -470,90 +472,145 @@ footer {
 
 /* Modal Styles */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
+    display: none; /* Hide modals by default */
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.4); /* Background with opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
-    background-color: #fff;
-    margin: 15% auto;
+    background-color: white;
+    margin: 10% auto;
     padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 500px;
-    font-size: 20px;
-    position: relative;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border: 1px solid #888;
+    width: 50%;
+    text-align: center;
 }
-/* Profile Edit Modal Styles */
 
-/* Center the modal */
+.close {
+    color: red;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+
+/* Profile Edit Modal Styles */
 #editInfoModal form {
     background: #fff;
-    padding: 30px; /* Slightly increased padding */
+    padding: 30px;
     border-radius: 12px;
     width: 95%;
-    max-width: 500px; /* Increased width for better visibility */
+    max-width: 550px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    font-size: 20px; /* Larger font size for readability */
-    font-weight: bold; /* Bolder text for better visibility */
-    line-height: 1; /* Increased line height for better spacing */
-}
-
-/* Input Fields */
-#editInfoModal input, 
-#editInfoModal select, 
-#editInfoModal textarea {
-    font-size: 20px; /* Larger input text */
-    padding: 12px; /* Better spacing */
-}
-
-/* Labels */
-#editInfoModal label {
-    font-size: 22px; /* Increase label size */
+    font-size: 20px;
     font-weight: bold;
+    line-height: 1.4;
 }
 
-/* Buttons */
-#editInfoModal button {
-    font-size: 22px; /* Larger button text */
-    padding: 16px 30px; /* More padding for better clicking */
+/* Centered Form Layout */
+.form-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 12px;
 }
 
-/* Profile Picture */
+#editInfoModal label {
+    font-size: 18px;
+    font-weight: bold;
+    width: 140px;
+    text-align: right;
+}
+
+#editInfoModal input,
+#editInfoModal select,
+#editInfoModal textarea {
+    flex: 1;
+    font-size: 18px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 100%;
+}
+
+/* Password Field with Eye Icon */
+.password-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* Space for eye icon */
+}
+
+.password-container .toggle-password {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+}
+
+/* Center Profile Picture */
 #editInfoModal img#editProfilePreview {
     display: block;
     margin: 15px auto;
     border-radius: 50%;
-    border: 3px solid #444; /* Darker border for visibility */
-    width: 100px; /* Bigger image */
-    height: 100px;
+    border: 3px solid #444;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
 }
 
-/* Center the Submit Button */
-#editInfoModal .button-container {
+/* Centered File Input */
+.file-input-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     margin-top: 15px;
+    width: 100%;
+    margin-bottom: 15px;
 }
 
-/* Submit Button */
+#editInfoModal input[type="file"] {
+    font-size: 16px;
+    
+    text-align: center;
+    width: 80%;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+/* Center the Update Profile Button */
+.button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
 #editInfoModal button[type="submit"] {
-    padding: 14px 30px; /* Adjusted padding for better fit */
-    font-size: 20px;
+    font-size: 18px;
+    padding: 14px 25px;
     font-weight: bold;
     background-color: #28a745;
     color: white;
@@ -563,9 +620,9 @@ footer {
     transition: background-color 0.3s ease, transform 0.2s;
 }
 
-/* Hover Effect: Only Button Changes to Red */
+/* Hover Effect */
 #editInfoModal button[type="submit"]:hover {
-    background-color: rgb(12, 9, 209);
+    background-color: #0c09d1;
     transform: scale(1.05);
 }
 
@@ -574,7 +631,7 @@ footer {
     position: absolute;
     top: 15px;
     right: 20px;
-    font-size: 28px; /* Increased size for better visibility */
+    font-size: 28px;
     font-weight: bold;
     color: #333;
     cursor: pointer;
