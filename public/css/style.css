@@ -1043,19 +1043,17 @@ button {
     margin-right: 10px;
     transition: background-color 0.3s ease;
 }
-@import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
 
 /* Styling for the "Your Products" label with a persuasive style */
 .products-label {
-    font-family: 'Satisfy', cursive; /* Apply the Satisfy font */
     font-size: 40px; /* Adjust font size */
     font-weight: normal; /* Keep the font weight normal for this style */
     color: #333; /* Dark color for the label */
     margin-right: 20px; /* Space between the label and button */
     display: inline-block; /* Display inline with the button */
     vertical-align: middle; /* Align label vertically with the button */
-    font-style: italic; /* Apply italic style */
 }
+
 /* Styling for the Categories label */
 .categories-label {
     font-family: 'Satisfy', cursive; /* Apply the Satisfy font */
@@ -1219,24 +1217,25 @@ button {
 /* Modal Style */
 .notification-modal {
     display: none; /* Hidden by default */
-    position: fixed;
+    position: absolute; /* Position it relative to its container */
     z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0); /* Black w/ opacity */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    top: 100%; /* Position it directly below the bell icon */
+    right: 0; /* Align it to the right side of the screen */
+    width: 300px; /* Adjust the width as needed */
+    max-height: 400px; /* Max height to prevent overflow */
+    overflow-y: auto; /* Scrollable if content exceeds */
+    background-color: rgb(0, 0, 0); /* Black with opacity */
+    background-color: rgba(0, 0, 0, 0.4); /* Black with opacity */
+    border-radius: 5px;
 }
 
 /* Modal Content */
 .notification-modal-content {
     background-color: #fff;
-    margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Could be more specific */
+    border-radius: 5px;
+    max-height: 400px; /* Limit height */
 }
 
 /* Close Button */
@@ -1299,7 +1298,8 @@ button {
 
 /* Responsive Modal */
 @media (max-width: 768px) {
-    .modal {
+    .notification-modal {
         width: 80%; /* Modal takes up more width on smaller screens */
+        right: 10px; /* Add some space from the edge */
     }
 }

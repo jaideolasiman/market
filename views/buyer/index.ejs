@@ -415,7 +415,7 @@
         <div id="notificationModal" class="modal">
             <div class="modal-content">
                 <span class="close" id="closeModalButton">&times;</span>
-                <center><h3>Notifications</h3></center>
+                <h3>Notifications</h3>
                 <ul id="notificationList">
                     <% notifications.forEach(notification => { %>
                         <li id="notification-<%= notification._id %>" class="notification <%= notification.status === 'unread' ? 'unread' : 'read' %>">
